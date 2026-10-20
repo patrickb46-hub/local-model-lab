@@ -1,0 +1,55 @@
+{
+  "tag": "",
+  "started_from": "base（从零）",
+  "steps": 2,
+  "n_effective": 2,
+  "n_dead": 0,
+  "pool": "branch-B-rl/data/prompts.jsonl",
+  "history": [
+    {
+      "step": 1,
+      "prompt_ids": [
+        "m0192"
+      ],
+      "mean_reward": 0.85,
+      "std_reward": 0.433,
+      "accuracy": 0.75,
+      "format_rate": 1.0,
+      "n_correct": 6,
+      "n_samples": 8,
+      "diversity": 0.393,
+      "loss": -0.0183,
+      "effective": true,
+      "tokens": 1866,
+      "peak_mem_gb": 11.07,
+      "step_s": 407.4,
+      "elapsed_s": 407.4
+    },
+    {
+      "step": 2,
+      "prompt_ids": [
+        "m0176"
+      ],
+      "mean_reward": 0.85,
+      "std_reward": 0.433,
+      "accuracy": 0.75,
+      "format_rate": 1.0,
+      "n_correct": 6,
+      "n_samples": 8,
+      "diversity": 0.249,
+      "loss": -0.017,
+      "effective": true,
+      "tokens": 1831,
+      "peak_mem_gb": 11.36,
+      "step_s": 369.0,
+      "elapsed_s": 776.4
+    }
+  ],
+  "weights": {
+    "correct": 1.0,
+    "format": 0.05,
+    "steps": 0.05,
+    "overlong_penalty": -0.1
+  },
+  "kl_coef": 0.02
+}

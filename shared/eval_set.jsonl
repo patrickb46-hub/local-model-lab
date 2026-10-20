@@ -1,0 +1,20 @@
+{"id": "m0000", "category": "因式分解", "prompt": "已知多项式 x² + 5x - 36 可以分解为 (x + p)(x + q) 的形式，其中 p、q 为整数。求 p² + q² 的值。", "answer": "97", "split": "eval"}
+{"id": "m0001", "category": "几何度量", "prompt": "在三角形 ABC 中，∠A = 60°，∠B = 78°，求 ∠C 的度数。", "answer": "42", "split": "eval"}
+{"id": "m0002", "category": "二元一次方程组", "prompt": "解方程组：\n-2x - 2y = 6\n-3x + 4y = 16\n求 x - y 的值。", "answer": "-5", "split": "eval"}
+{"id": "m0003", "category": "分式运算", "prompt": "先化简，再求值：(x² - 49) ÷ (x - 7)，其中 x = 8。", "answer": "15", "split": "eval"}
+{"id": "m0004", "category": "比例百分数", "prompt": "某商品的单价是 100 元，先上涨 50%，再下降 50%，求最终价格是多少元。", "answer": "75", "split": "eval"}
+{"id": "m0005", "category": "一元一次方程", "prompt": "解方程：7x + 12 = 2x - 1，求 x 的值。", "answer": "-13/5", "split": "eval"}
+{"id": "m0006", "category": "因式分解", "prompt": "已知多项式 x² - 8x + 12 可以分解为 (x + p)(x + q) 的形式，其中 p、q 为整数。求 p² + q² 的值。", "answer": "40", "split": "eval"}
+{"id": "m0007", "category": "整式运算", "prompt": "当 x = 2 时，求代数式 4x² - 4x + 5 的值。", "answer": "13", "split": "eval"}
+{"id": "m0008", "category": "一次函数", "prompt": "已知一次函数 y = kx + b 的图像经过点 (4, -3) 和 (2, -1)。求当 x = 8 时 y 的值。", "answer": "-7", "split": "eval"}
+{"id": "m0009", "category": "整式运算", "prompt": "当 x = -2 时，求代数式 x² - 3x + 3 的值。", "answer": "13", "split": "eval"}
+{"id": "m0010", "category": "分式运算", "prompt": "先化简，再求值：(x² - 9) ÷ (x - 3)，其中 x = -6。", "answer": "-3", "split": "eval"}
+{"id": "m0011", "category": "二元一次方程组", "prompt": "解方程组：\n-x + 2y = -3\n-x - y = 9\n求 x - y 的值。", "answer": "-1", "split": "eval"}
+{"id": "m0012", "category": "比例百分数", "prompt": "某商品的单价是 100 元，先上涨 10%，再下降 10%，求最终价格是多少元。", "answer": "99", "split": "eval"}
+{"id": "m0013", "category": "因式分解", "prompt": "已知多项式 x² + 2x - 15 可以分解为 (x + p)(x + q) 的形式，其中 p、q 为整数。求 p² + q² 的值。", "answer": "34", "split": "eval"}
+{"id": "m0014", "category": "分式运算", "prompt": "先化简，再求值：(x² - 36) ÷ (x - 6)，其中 x = 4。", "answer": "10", "split": "eval"}
+{"id": "m0015", "category": "整式运算", "prompt": "当 x = -2 时，求代数式 -x² - 2x + 3 的值。", "answer": "3", "split": "eval"}
+{"id": "m0016", "category": "因式分解", "prompt": "已知多项式 x² + 14x + 45 可以分解为 (x + p)(x + q) 的形式，其中 p、q 为整数。求 p² + q² 的值。", "answer": "106", "split": "eval"}
+{"id": "m0017", "category": "一元一次不等式", "prompt": "解不等式：6x - 15 < 24，求它的最大整数解。", "answer": "6", "split": "eval"}
+{"id": "m0018", "category": "比例百分数", "prompt": "一件商品的原价是 500 元，现在打 5 折出售，求现价是多少元。", "answer": "250", "split": "eval"}
+{"id": "m0019", "category": "一元一次不等式", "prompt": "解不等式：4x - 1 < 33，求它的最大整数解。", "answer": "8", "split": "eval"}

@@ -1,0 +1,10 @@
+{"id": "g01", "prompt": "用一句话介绍你自己。", "keywords": []}
+{"id": "g02", "prompt": "中国的首都是哪座城市？", "keywords": ["北京"]}
+{"id": "g03", "prompt": "一年有多少个月？", "keywords": ["12", "十二"]}
+{"id": "g04", "prompt": "请说出三种水果的名字。", "keywords": ["苹果", "香蕉", "橙", "梨", "葡萄"]}
+{"id": "g05", "prompt": "太阳从哪个方向升起？", "keywords": ["东"]}
+{"id": "g06", "prompt": "把下面这句话翻译成英文：我喜欢读书。", "keywords": ["I like", "I enjoy", "love reading", "like reading"]}
+{"id": "g07", "prompt": "水的化学式是什么？", "keywords": ["H2O", "H₂O"]}
+{"id": "g08", "prompt": "请用一句话说明什么是三角形。", "keywords": ["三条", "三个", "边"]}
+{"id": "g09", "prompt": "3 加 5 等于多少？", "keywords": ["8"]}
+{"id": "g10", "prompt": "请写一句简短的问候语给朋友。", "keywords": []}

@@ -1,0 +1,17 @@
+{
+  "samples": 110,
+  "epochs": 5,
+  "steps": 60,
+  "wall_s": 7867.2,
+  "peak_mem_gb": 12.18,
+  "dtype": "float32",
+  "max_seq_length": 288,
+  "lora": {
+    "r": 16,
+    "alpha": 32,
+    "dropout": 0.05,
+    "target_modules": "auto",
+    "bias": "none"
+  },
+  "probe": false
+}

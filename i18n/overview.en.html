@@ -1,0 +1,732 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Project Overview · Can a Small AI Student Surpass Its Teacher?</title>
+<style>
+  :root{
+    --bg:#f6f8fb; --card:#ffffff; --text:#1e293b; --muted:#64748b;
+    --line:#e2e8f0; --blue:#2563eb; --blue-bg:#eff6ff;
+    --green:#16a34a; --green-bg:#f0fdf4;
+    --red:#dc2626; --red-bg:#fef2f2;
+    --amber:#d97706; --amber-bg:#fffbeb;
+    --purple:#7c3aed; --purple-bg:#faf5ff;
+    --shadow:0 1px 3px rgba(15,23,42,.06),0 8px 24px rgba(15,23,42,.06);
+  }
+  @media (prefers-color-scheme: dark){
+    :root{
+      --bg:#0b1220; --card:#141e30; --text:#e5edf8; --muted:#94a3b8;
+      --line:#25324a; --blue:#60a5fa; --blue-bg:#152447;
+      --green:#4ade80; --green-bg:#12291d;
+      --red:#f87171; --red-bg:#2a1517;
+      --amber:#fbbf24; --amber-bg:#2a2110;
+      --purple:#a78bfa; --purple-bg:#221a3a;
+      --shadow:0 1px 3px rgba(0,0,0,.4),0 8px 24px rgba(0,0,0,.3);
+    }
+  }
+  *{box-sizing:border-box}
+  body{
+    margin:0; background:var(--bg); color:var(--text);
+    font:16px/1.75 -apple-system,BlinkMacSystemFont,"PingFang SC","Hiragino Sans GB","Microsoft YaHei",sans-serif;
+    -webkit-font-smoothing:antialiased;
+  }
+  .wrap{max-width:960px;margin:0 auto;padding:0 24px 80px}
+  header{
+    background:linear-gradient(135deg,#1e40af,#3b82f6 55%,#60a5fa);
+    color:#fff; padding:56px 0 48px; margin-bottom:36px;
+  }
+  header .wrap{padding-bottom:0}
+  header h1{margin:0 0 12px;font-size:34px;line-height:1.35;letter-spacing:-.5px}
+  header .sub{font-size:17px;opacity:.94;margin:0}
+  header .meta{margin-top:22px;font-size:13px;opacity:.8}
+
+  h2{
+    font-size:23px;margin:52px 0 18px;padding-bottom:10px;
+    border-bottom:2px solid var(--line);letter-spacing:-.3px;
+  }
+  h3{font-size:17px;margin:30px 0 12px}
+  p{margin:0 0 14px}
+  .muted{color:var(--muted)}
+
+  .card{
+    background:var(--card);border:1px solid var(--line);border-radius:14px;
+    padding:22px 24px;box-shadow:var(--shadow);margin:18px 0;
+  }
+  .hero{
+    background:var(--blue-bg);border:1px solid var(--blue);
+    border-left:6px solid var(--blue);border-radius:12px;padding:22px 26px;margin:24px 0;
+  }
+  .hero p{margin:0;font-size:18px;line-height:1.8}
+  .hero strong{color:var(--blue)}
+
+  table{width:100%;border-collapse:collapse;margin:16px 0;font-size:15px}
+  th,td{padding:11px 12px;text-align:left;border-bottom:1px solid var(--line)}
+  th{font-size:13px;color:var(--muted);font-weight:600;text-transform:none}
+  tbody tr:hover{background:var(--blue-bg)}
+  td.num,th.num{text-align:right;font-variant-numeric:tabular-nums}
+  .win{font-weight:700;color:var(--green)}
+  .lose{color:var(--red)}
+  .dim{color:var(--muted)}
+
+  .grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin:20px 0}
+  @media(max-width:760px){.grid3{grid-template-columns:1fr}}
+  .method{
+    background:var(--card);border:1px solid var(--line);border-radius:14px;
+    padding:20px;box-shadow:var(--shadow);border-top:4px solid var(--line);
+  }
+  .method.a{border-top-color:var(--purple)}
+  .method.b{border-top-color:var(--green)}
+  .method.c{border-top-color:var(--amber)}
+  .method h4{margin:0 0 6px;font-size:16px}
+  .method .tag{
+    display:inline-block;font-size:12px;padding:2px 9px;border-radius:99px;
+    margin-bottom:10px;font-weight:600;
+  }
+  .method.a .tag{background:var(--purple-bg);color:var(--purple)}
+  .method.b .tag{background:var(--green-bg);color:var(--green)}
+  .method.c .tag{background:var(--amber-bg);color:var(--amber)}
+  .method p{margin:8px 0 0;font-size:14px;color:var(--muted);line-height:1.7}
+
+  /* 三层阶梯 */
+  .layers{margin:22px 0}
+  .layer{
+    display:flex;align-items:center;gap:18px;padding:16px 20px;margin:10px 0;
+    background:var(--card);border:1px solid var(--line);border-radius:12px;
+    border-left:6px solid var(--line);
+  }
+  .layer.l1{border-left-color:var(--green)}
+  .layer.l2{border-left-color:var(--red);background:var(--red-bg)}
+  .layer.l3{border-left-color:var(--purple)}
+  .layer .badge{
+    flex:0 0 auto;font-size:15px;font-weight:800;width:44px;height:44px;
+    display:flex;align-items:center;justify-content:center;border-radius:11px;
+    background:var(--bg);border:1px solid var(--line);
+  }
+  .layer .body{flex:1}
+  .layer .body b{display:block;font-size:15px;margin-bottom:3px}
+  .layer .body span{font-size:14px;color:var(--muted)}
+  .layer .num{flex:0 0 auto;font-size:14px;color:var(--muted);text-align:right}
+
+  /* 条形图 */
+  .bars{margin:18px 0}
+  .bar-row{display:flex;align-items:center;gap:12px;margin:9px 0;font-size:14px}
+  .bar-row .name{flex:0 0 108px;color:var(--muted)}
+  .bar-track{flex:1;height:26px;background:var(--bg);border-radius:7px;overflow:hidden;position:relative;border:1px solid var(--line)}
+  .bar-fill{height:100%;border-radius:6px;display:flex;align-items:center;justify-content:flex-end;padding-right:8px;font-size:13px;font-weight:700;color:#fff;transition:width .3s}
+  .bar-fill.z{justify-content:flex-start;padding-left:8px;color:var(--muted);font-weight:600}
+
+  .verdict{
+    background:var(--green-bg);border:1px solid var(--green);border-left:6px solid var(--green);
+    border-radius:12px;padding:22px 26px;margin:24px 0;
+  }
+  .verdict h3{margin:0 0 12px;color:var(--green);font-size:18px}
+  .verdict ul{margin:0;padding-left:22px}
+  .verdict li{margin:9px 0}
+  .warn{
+    background:var(--amber-bg);border:1px solid var(--amber);border-left:6px solid var(--amber);
+    border-radius:12px;padding:18px 24px;margin:20px 0;
+  }
+  .warn p{margin:0;font-size:15px}
+
+  /* 时间线 */
+  .tl{margin:20px 0;border-left:3px solid var(--line);padding-left:0}
+  .tl-item{position:relative;padding:0 0 20px 30px}
+  .tl-item::before{
+    content:'';position:absolute;left:-9px;top:6px;width:15px;height:15px;
+    border-radius:50%;background:var(--card);border:3px solid var(--blue);
+  }
+  .tl-item.done::before{background:var(--green);border-color:var(--green)}
+  .tl-item b{display:block;font-size:15px}
+  .tl-item span{font-size:13px;color:var(--muted)}
+
+  /* 文件树 */
+  pre.tree{
+    background:var(--card);border:1px solid var(--line);border-radius:12px;
+    padding:20px 22px;overflow-x:auto;font-size:13.5px;line-height:1.85;
+    font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;margin:16px 0;
+  }
+  pre.tree b{color:var(--blue)}
+  pre.tree i{color:var(--muted);font-style:normal}
+
+  .gloss{display:grid;grid-template-columns:repeat(2,1fr);gap:14px;margin:18px 0}
+  @media(max-width:760px){.gloss{grid-template-columns:1fr}}
+  .gloss-item{background:var(--card);border:1px solid var(--line);border-radius:11px;padding:15px 18px}
+  .gloss-item b{display:block;font-size:15px;margin-bottom:5px;color:var(--blue)}
+  .gloss-item span{font-size:14px;color:var(--muted);line-height:1.7}
+
+  footer{margin-top:60px;padding-top:24px;border-top:1px solid var(--line);font-size:13px;color:var(--muted)}
+  .kbd{background:var(--bg);border:1px solid var(--line);border-radius:5px;padding:1px 7px;font-size:13px;font-family:ui-monospace,Menlo,monospace}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="wrap">
+    <h1>Can a small AI student surpass its teacher?</h1>
+    <p class="sub">Local Model Lab · Distillation vs. Reinforcement Learning, a controlled experiment</p>
+    <p class="meta">October 2026 ｜ Every step run CPU-only on a 2018 Intel MacBook Pro ｜ Reproducible with no internet connection</p>
+  </div>
+</header>
+
+<div class="wrap">
+
+  <div class="hero">
+    <p>
+      <strong>The verdict up front: yes.</strong>
+      On questions <b>"the teacher itself can't solve"</b>,
+      a small model trained by <b>practicing on its own (reinforcement learning)</b> reaches <strong>56%</strong>,
+      while one trained by <b>copying the teacher's worked solutions (distillation)</b> not only fails to improve,
+      but <strong>falls back from 40% to 17%</strong>.
+    </p>
+  </div>
+
+  <h2>1. What this is about</h2>
+
+  <p>
+    Let's use an analogy. There's <b>a small student</b> (a small AI model) who needs to practice math.
+    Beside them is <b>a big student</b> (a larger AI model), who is more advanced.
+  </p>
+
+  <p>
+    Now there are two ways to practice:
+  </p>
+
+  <div class="grid3">
+    <div class="method a">
+      <span class="tag">Method 1 · Distillation</span>
+      <h4>Copy the big student's worked solutions</h4>
+      <p>The small student copies, step by step, how the big student solves each problem and how they start writing it down. After enough copying, the small student's thinking starts to look like the big student's.</p>
+    </div>
+    <div class="method b">
+      <span class="tag">Method 2 · Reinforcement Learning</span>
+      <h4>Solve problems yourself, check your own answers</h4>
+      <p>Nobody teaches them. The small student solves problems, then checks the answers; get it right and remember the approach, get it wrong and adjust. Dozens of rounds.</p>
+    </div>
+    <div class="method c">
+      <span class="tag">Method 3 · Copy, Then Practice</span>
+      <h4>Copy once, then solve problems yourself</h4>
+      <p>Use both routes: first copy the big student's worked solutions as a foundation, then practice on your own.</p>
+    </div>
+  </div>
+
+  <p>
+    These three ways of practicing map to the project's three experimental subjects: <b>A1</b> (distillation), <b>B</b> (reinforcement learning), <b>C</b> (distillation first, then reinforcement learning).
+    There are also two reference points: <b>base</b> (the original small student, trained on nothing) and <b>teacher</b> (the big student itself).
+  </p>
+
+  <div class="warn">
+    <p>
+      <b>Why not just train "the big student" directly?</b>
+      Because this machine has only 16GB of RAM and no discrete GPU — training the big student (9B parameters) is physically impossible.
+      So we only train the small student, make it as strong as we can, and see whether it can step up.
+    </p>
+  </div>
+
+  <h2>2. The key design: splitting the questions into three tiers</h2>
+
+  <p>
+    This is the single most important design decision in the whole experiment. The questions can't be chosen at random —
+    <b>they have to come in three tiers, so that you can tell whether something was truly learned or just copied.</b>
+  </p>
+
+  <div class="layers">
+    <div class="layer l1">
+      <div class="badge">L1</div>
+      <div class="body">
+        <b>Questions the big student can also solve (basics)</b>
+        <span>20 questions. Used to check whether the fundamentals have slipped.</span>
+      </div>
+      <div class="num">20 questions</div>
+    </div>
+    <div class="layer l2">
+      <div class="badge">L2</div>
+      <div class="body">
+        <b>Questions the big student itself can't solve either ← this tier matters most</b>
+        <span>16 questions. The original small student actually gets a few of them right.</span>
+      </div>
+      <div class="num">16 questions</div>
+    </div>
+    <div class="layer l3">
+      <div class="badge">L3</div>
+      <div class="body">
+        <b>Questions neither the big student nor the original small student can solve</b>
+        <span>16 questions. Used to test whether a genuinely new skill was learned.</span>
+      </div>
+      <div class="num">16 questions</div>
+    </div>
+  </div>
+
+  <p>
+    <b>Why does L2 matter most?</b>
+    Because if you only compare on "questions the big student can do", the copycat is bound to win — those are exactly the ones they copied.
+    Only on <b>questions the big student itself can't solve</b> can you tell whether someone <b>really thinks, or only imitates</b>.
+  </p>
+
+  <p class="muted">
+    These questions aren't picked at random — they're math problems generated automatically by a script, each with a single correct answer that is 100% easy to grade —
+    so there's no "disputed grading criteria" problem, and the results are completely objective.
+  </p>
+
+  <h2>3. Results</h2>
+
+  <h3>3.1 Overall scores</h3>
+  <p class="muted">Below are each role's average score across all 52 questions (each question answered 3 times and averaged).</p>
+
+  <table>
+    <thead>
+      <tr>
+        <th>Role</th>
+        <th class="num">Overall</th>
+        <th class="num">L1 Basics</th>
+        <th class="num">L2 Teacher-fails</th>
+        <th class="num">L3 Both-fail</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>base · original small student</td>
+        <td class="num">30.8%</td><td class="num">48.3%</td>
+        <td class="num dim">39.6%</td><td class="num dim">0.0%</td>
+      </tr>
+      <tr>
+        <td>A1 · copied the big student</td>
+        <td class="num">28.2%</td><td class="num">53.3%</td>
+        <td class="num lose">16.7%</td><td class="num">8.3%</td>
+      </tr>
+      <tr>
+        <td><b>B · practiced on its own</b></td>
+        <td class="num"><b>49.4%</b></td><td class="num">66.7%</td>
+        <td class="num win">56.2%</td><td class="num win">20.8%</td>
+      </tr>
+      <tr>
+        <td><b>C · copied then practiced</b></td>
+        <td class="num"><b>51.3%</b></td><td class="num">70.0%</td>
+        <td class="num win">54.2%</td><td class="num win">25.0%</td>
+      </tr>
+      <tr>
+        <td>teacher · the big student itself</td>
+        <td class="num">27.6%</td><td class="num">71.7%</td>
+        <td class="num dim">0.0%</td><td class="num dim">0.0%</td>
+      </tr>
+      <tr>
+        <td>dsv4pro · top cloud model</td>
+        <td class="num">95.5%</td><td class="num">100%</td>
+        <td class="num">97.9%</td><td class="num">87.5%</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <p class="muted" style="font-size:14px">
+    Note: the L2 tier is, <b>by definition</b>, the set of questions "the big student got entirely wrong", so the big student is necessarily at 0% on L2 —
+    which is exactly what shows this tier's screening was carried out strictly.
+  </p>
+
+  <!-- CHART:BEGIN grouped-bars -->
+<svg viewBox="0 0 760 380" width="100%" role="img" aria-label="Accuracy of each role across the three difficulty tiers" style="display:block;margin:6px 0 2px">
+<rect x="54" y="14" width="13" height="13" rx="3" fill="#22c55e"/>
+<text x="73" y="25" font-size="13" fill="var(--muted)">L1 Basics</text>
+<rect x="180" y="14" width="13" height="13" rx="3" fill="#dc2626"/>
+<text x="199" y="25" font-size="13" fill="var(--muted)">L2 Teacher-fails</text>
+<rect x="319" y="14" width="13" height="13" rx="3" fill="#8b5cf6"/>
+<text x="338" y="25" font-size="13" fill="var(--muted)">L3 Both-fail</text>
+<line x1="54" y1="318.0" x2="742" y2="318.0" stroke="var(--line)" stroke-width="1" />
+<text x="45" y="322.0" font-size="11" fill="var(--muted)" text-anchor="end">0%</text>
+<line x1="54" y1="250.0" x2="742" y2="250.0" stroke="var(--line)" stroke-width="1" />
+<text x="45" y="254.0" font-size="11" fill="var(--muted)" text-anchor="end">25%</text>
+<line x1="54" y1="182.0" x2="742" y2="182.0" stroke="var(--line)" stroke-width="1" />
+<text x="45" y="186.0" font-size="11" fill="var(--muted)" text-anchor="end">50%</text>
+<line x1="54" y1="114.0" x2="742" y2="114.0" stroke="var(--line)" stroke-width="1" />
+<text x="45" y="118.0" font-size="11" fill="var(--muted)" text-anchor="end">75%</text>
+<line x1="54" y1="46.0" x2="742" y2="46.0" stroke="var(--line)" stroke-width="1" />
+<text x="45" y="50.0" font-size="11" fill="var(--muted)" text-anchor="end">100%</text>
+<rect x="65.3" y="186.5" width="26" height="131.5" rx="3" fill="#22c55e" opacity="0.92"><title>Base · L1 Basics: 48.3%</title></rect>
+<text x="78.3" y="182.5" font-size="10.5" fill="var(--text)" text-anchor="middle">48</text>
+<rect x="98.3" y="210.3" width="26" height="107.7" rx="3" fill="#dc2626" opacity="0.92"><title>Base · L2 Teacher-fails: 39.6%</title></rect>
+<text x="111.3" y="206.3" font-size="10.5" fill="var(--text)" text-anchor="middle">40</text>
+<rect x="131.3" y="318.0" width="26" height="1.0" rx="3" fill="#8b5cf6" opacity="0.92"><title>Base · L3 Both-fail: 0.0%</title></rect>
+<text x="144.3" y="312.0" font-size="10" fill="var(--muted)" text-anchor="middle">0</text>
+<text x="111.3" y="338.0" font-size="12.5" fill="var(--text)" text-anchor="middle">Base</text>
+<rect x="180.0" y="172.9" width="26" height="145.1" rx="3" fill="#22c55e" opacity="0.92"><title>A1 · Distilled · L1 Basics: 53.3%</title></rect>
+<text x="193.0" y="168.9" font-size="10.5" fill="var(--text)" text-anchor="middle">53</text>
+<rect x="213.0" y="272.7" width="26" height="45.3" rx="3" fill="#dc2626" opacity="0.92"><title>A1 · Distilled · L2 Teacher-fails: 16.7%</title></rect>
+<text x="226.0" y="268.7" font-size="10.5" fill="var(--text)" text-anchor="middle">17</text>
+<rect x="246.0" y="295.3" width="26" height="22.7" rx="3" fill="#8b5cf6" opacity="0.92"><title>A1 · Distilled · L3 Both-fail: 8.3%</title></rect>
+<text x="259.0" y="291.3" font-size="10.5" fill="var(--text)" text-anchor="middle">8</text>
+<text x="226.0" y="338.0" font-size="12.5" fill="var(--text)" text-anchor="middle">A1 · Distilled</text>
+<rect x="294.7" y="136.7" width="26" height="181.3" rx="3" fill="#22c55e" opacity="0.92"><title>B · RL · L1 Basics: 66.7%</title></rect>
+<text x="307.7" y="132.7" font-size="10.5" fill="var(--text)" text-anchor="middle">67</text>
+<rect x="327.7" y="165.0" width="26" height="153.0" rx="3" fill="#dc2626" opacity="0.92"><title>B · RL · L2 Teacher-fails: 56.2%</title></rect>
+<text x="340.7" y="161.0" font-size="10.5" fill="var(--text)" text-anchor="middle">56</text>
+<rect x="360.7" y="261.3" width="26" height="56.7" rx="3" fill="#8b5cf6" opacity="0.92"><title>B · RL · L3 Both-fail: 20.8%</title></rect>
+<text x="373.7" y="257.3" font-size="10.5" fill="var(--text)" text-anchor="middle">21</text>
+<text x="340.7" y="338.0" font-size="12.5" fill="var(--text)" text-anchor="middle">B · RL</text>
+<rect x="409.3" y="127.6" width="26" height="190.4" rx="3" fill="#22c55e" opacity="0.92"><title>C · Hybrid · L1 Basics: 70.0%</title></rect>
+<text x="422.3" y="123.6" font-size="10.5" fill="var(--text)" text-anchor="middle">70</text>
+<rect x="442.3" y="170.7" width="26" height="147.3" rx="3" fill="#dc2626" opacity="0.92"><title>C · Hybrid · L2 Teacher-fails: 54.2%</title></rect>
+<text x="455.3" y="166.7" font-size="10.5" fill="var(--text)" text-anchor="middle">54</text>
+<rect x="475.3" y="250.0" width="26" height="68.0" rx="3" fill="#8b5cf6" opacity="0.92"><title>C · Hybrid · L3 Both-fail: 25.0%</title></rect>
+<text x="488.3" y="246.0" font-size="10.5" fill="var(--text)" text-anchor="middle">25</text>
+<text x="455.3" y="338.0" font-size="12.5" fill="var(--text)" text-anchor="middle">C · Hybrid</text>
+<rect x="524.0" y="123.1" width="26" height="194.9" rx="3" fill="#22c55e" opacity="0.92"><title>Teacher · L1 Basics: 71.7%</title></rect>
+<text x="537.0" y="119.1" font-size="10.5" fill="var(--text)" text-anchor="middle">72</text>
+<rect x="557.0" y="318.0" width="26" height="1.0" rx="3" fill="#dc2626" opacity="0.92"><title>Teacher · L2 Teacher-fails: 0.0%</title></rect>
+<text x="570.0" y="312.0" font-size="10" fill="var(--muted)" text-anchor="middle">0</text>
+<rect x="590.0" y="318.0" width="26" height="1.0" rx="3" fill="#8b5cf6" opacity="0.92"><title>Teacher · L3 Both-fail: 0.0%</title></rect>
+<text x="603.0" y="312.0" font-size="10" fill="var(--muted)" text-anchor="middle">0</text>
+<text x="570.0" y="338.0" font-size="12.5" fill="var(--text)" text-anchor="middle">Teacher</text>
+<rect x="638.7" y="46.0" width="26" height="272.0" rx="3" fill="#22c55e" opacity="0.92"><title>Cloud · L1 Basics: 100.0%</title></rect>
+<text x="651.7" y="42.0" font-size="10.5" fill="var(--text)" text-anchor="middle">100</text>
+<rect x="671.7" y="51.7" width="26" height="266.3" rx="3" fill="#dc2626" opacity="0.92"><title>Cloud · L2 Teacher-fails: 97.9%</title></rect>
+<text x="684.7" y="47.7" font-size="10.5" fill="var(--text)" text-anchor="middle">98</text>
+<rect x="704.7" y="80.0" width="26" height="238.0" rx="3" fill="#8b5cf6" opacity="0.92"><title>Cloud · L3 Both-fail: 87.5%</title></rect>
+<text x="717.7" y="76.0" font-size="10.5" fill="var(--text)" text-anchor="middle">88</text>
+<text x="684.7" y="338.0" font-size="12.5" fill="var(--text)" text-anchor="middle">Cloud</text>
+<line x1="54" y1="318" x2="742" y2="318" stroke="var(--line)" stroke-width="1.5"/>
+</svg>
+<!-- CHART:END grouped-bars -->
+
+  <p class="muted" style="font-size:14px">
+    Taller bars are better. <b>The red bar (L2) is the crux of the whole thing</b> —
+    on the red bar, the homework-copying A1 is the only one "shorter than not studying at all".
+  </p>
+
+  <h3>3.2 The key chart: performance on L2</h3>
+
+  <div class="bars">
+    <div class="bar-row">
+      <div class="name">The big student itself</div>
+      <div class="bar-track"><div class="bar-fill z" style="width:2%">0%</div></div>
+    </div>
+    <div class="bar-row">
+      <div class="name">Original small student</div>
+      <div class="bar-track"><div class="bar-fill" style="width:39.6%;background:var(--muted)">39.6%</div></div>
+    </div>
+    <div class="bar-row">
+      <div class="name">A1 copied the big student</div>
+      <div class="bar-track"><div class="bar-fill" style="width:16.7%;background:var(--red)">16.7%</div></div>
+    </div>
+    <div class="bar-row">
+      <div class="name"><b>B practiced on its own</b></div>
+      <div class="bar-track"><div class="bar-fill" style="width:56.2%;background:var(--green)">56.2%</div></div>
+    </div>
+    <div class="bar-row">
+      <div class="name"><b>C copied then practiced</b></div>
+      <div class="bar-track"><div class="bar-fill" style="width:54.2%;background:var(--green)">54.2%</div></div>
+    </div>
+  </div>
+
+  <p>
+    You can see it at a glance: <b>the homework-copier is the only one worse than "not studying at all".</b>
+  </p>
+
+  <h3>3.3 Another angle: from basics to hard questions, who's falling off?</h3>
+
+  <p>
+    Line the three tiers up in order of difficulty and follow how each role trends across them —
+    a line chart is more intuitive than a table: <b>the ones that should stay flat stay flat, the ones that should drop do drop</b>.
+  </p>
+
+  <!-- CHART:BEGIN layer-trend -->
+<svg viewBox="0 0 760 422" width="100%" role="img" aria-label="Trend of each role from basics to hard questions" style="display:block;margin:6px 0 2px">
+<line x1="54" y1="326.0" x2="664" y2="326.0" stroke="var(--line)"/>
+<text x="45" y="330.0" font-size="11" fill="var(--muted)" text-anchor="end">0%</text>
+<line x1="54" y1="255.5" x2="664" y2="255.5" stroke="var(--line)"/>
+<text x="45" y="259.5" font-size="11" fill="var(--muted)" text-anchor="end">25%</text>
+<line x1="54" y1="185.0" x2="664" y2="185.0" stroke="var(--line)"/>
+<text x="45" y="189.0" font-size="11" fill="var(--muted)" text-anchor="end">50%</text>
+<line x1="54" y1="114.5" x2="664" y2="114.5" stroke="var(--line)"/>
+<text x="45" y="118.5" font-size="11" fill="var(--muted)" text-anchor="end">75%</text>
+<line x1="54" y1="44.0" x2="664" y2="44.0" stroke="var(--line)"/>
+<text x="45" y="48.0" font-size="11" fill="var(--muted)" text-anchor="end">100%</text>
+<text x="54.0" y="376.0" font-size="12.5" fill="var(--text)" text-anchor="middle">L1 Basics</text>
+<text x="359.0" y="376.0" font-size="12.5" fill="var(--text)" text-anchor="middle">L2 Teacher-fails</text>
+<text x="664.0" y="376.0" font-size="12.5" fill="var(--text)" text-anchor="middle">L3 Both-fail</text>
+<line x1="54" y1="326" x2="664" y2="326" stroke="var(--line)" stroke-width="1.5"/>
+<polyline points="54.0,189.7 359.0,214.4 664.0,326.0" fill="none" stroke="#94a3b8" stroke-width="2.6" stroke-linejoin="round" stroke-linecap="round" opacity="0.95"/>
+<polyline points="54.0,175.6 359.0,279.0 664.0,302.5" fill="none" stroke="#7c3aed" stroke-width="2.6" stroke-linejoin="round" stroke-linecap="round" opacity="0.95"/>
+<polyline points="54.0,138.0 359.0,167.4 664.0,267.2" fill="none" stroke="#16a34a" stroke-width="2.6" stroke-linejoin="round" stroke-linecap="round" opacity="0.95"/>
+<polyline points="54.0,128.6 359.0,173.2 664.0,255.5" fill="none" stroke="#d97706" stroke-width="2.6" stroke-linejoin="round" stroke-linecap="round" opacity="0.95"/>
+<polyline points="54.0,123.9 359.0,326.0 664.0,326.0" fill="none" stroke="#dc2626" stroke-width="2.6" stroke-linejoin="round" stroke-linecap="round" opacity="0.95"/>
+<polyline points="54.0,44.0 359.0,49.9 664.0,79.2" fill="none" stroke="#2563eb" stroke-width="2.6" stroke-linejoin="round" stroke-linecap="round" opacity="0.95"/>
+<circle cx="54.0" cy="189.7" r="4.6" fill="#94a3b8" stroke="var(--card)" stroke-width="1.8"><title>Base · L1 Basics: 48.3%</title></circle>
+<text x="63.0" y="215.7" font-size="10.5" font-weight="600" fill="#94a3b8" style="paint-order:stroke;stroke:var(--card);stroke-width:3px">48%</text>
+<circle cx="359.0" cy="214.4" r="4.6" fill="#94a3b8" stroke="var(--card)" stroke-width="1.8"><title>Base · L2 Teacher-fails: 39.6%</title></circle>
+<text x="368.0" y="227.4" font-size="10.5" font-weight="600" fill="#94a3b8" style="paint-order:stroke;stroke:var(--card);stroke-width:3px">40%</text>
+<circle cx="664.0" cy="326.0" r="4.6" fill="#94a3b8" stroke="var(--card)" stroke-width="1.8"><title>Base · L3 Both-fail: 0.0%</title></circle>
+<text x="673.0" y="352.0" font-size="10.5" font-weight="600" fill="#94a3b8" style="paint-order:stroke;stroke:var(--card);stroke-width:3px">0%</text>
+<circle cx="54.0" cy="175.6" r="4.6" fill="#7c3aed" stroke="var(--card)" stroke-width="1.8"><title>A1 · Distilled · L1 Basics: 53.3%</title></circle>
+<text x="63.0" y="188.6" font-size="10.5" font-weight="600" fill="#7c3aed" style="paint-order:stroke;stroke:var(--card);stroke-width:3px">53%</text>
+<circle cx="359.0" cy="279.0" r="4.6" fill="#7c3aed" stroke="var(--card)" stroke-width="1.8"><title>A1 · Distilled · L2 Teacher-fails: 16.7%</title></circle>
+<text x="368.0" y="269.0" font-size="10.5" font-weight="600" fill="#7c3aed" style="paint-order:stroke;stroke:var(--card);stroke-width:3px">17%</text>
+<circle cx="664.0" cy="302.5" r="4.6" fill="#7c3aed" stroke="var(--card)" stroke-width="1.8"><title>A1 · Distilled · L3 Both-fail: 8.3%</title></circle>
+<text x="673.0" y="315.5" font-size="10.5" font-weight="600" fill="#7c3aed" style="paint-order:stroke;stroke:var(--card);stroke-width:3px">8%</text>
+<circle cx="54.0" cy="138.0" r="4.6" fill="#16a34a" stroke="var(--card)" stroke-width="1.8"><title>B · RL · L1 Basics: 66.7%</title></circle>
+<text x="63.0" y="164.0" font-size="10.5" font-weight="600" fill="#16a34a" style="paint-order:stroke;stroke:var(--card);stroke-width:3px">67%</text>
+<circle cx="359.0" cy="167.4" r="4.6" fill="#16a34a" stroke="var(--card)" stroke-width="1.8"><title>B · RL · L2 Teacher-fails: 56.2%</title></circle>
+<text x="368.0" y="157.4" font-size="10.5" font-weight="600" fill="#16a34a" style="paint-order:stroke;stroke:var(--card);stroke-width:3px">56%</text>
+<circle cx="664.0" cy="267.2" r="4.6" fill="#16a34a" stroke="var(--card)" stroke-width="1.8"><title>B · RL · L3 Both-fail: 20.8%</title></circle>
+<text x="673.0" y="280.2" font-size="10.5" font-weight="600" fill="#16a34a" style="paint-order:stroke;stroke:var(--card);stroke-width:3px">21%</text>
+<circle cx="54.0" cy="128.6" r="4.6" fill="#d97706" stroke="var(--card)" stroke-width="1.8"><title>C · Hybrid · L1 Basics: 70.0%</title></circle>
+<text x="63.0" y="141.6" font-size="10.5" font-weight="600" fill="#d97706" style="paint-order:stroke;stroke:var(--card);stroke-width:3px">70%</text>
+<circle cx="359.0" cy="173.2" r="4.6" fill="#d97706" stroke="var(--card)" stroke-width="1.8"><title>C · Hybrid · L2 Teacher-fails: 54.2%</title></circle>
+<text x="368.0" y="186.2" font-size="10.5" font-weight="600" fill="#d97706" style="paint-order:stroke;stroke:var(--card);stroke-width:3px">54%</text>
+<circle cx="664.0" cy="255.5" r="4.6" fill="#d97706" stroke="var(--card)" stroke-width="1.8"><title>C · Hybrid · L3 Both-fail: 25.0%</title></circle>
+<text x="673.0" y="245.5" font-size="10.5" font-weight="600" fill="#d97706" style="paint-order:stroke;stroke:var(--card);stroke-width:3px">25%</text>
+<circle cx="54.0" cy="123.9" r="4.6" fill="#dc2626" stroke="var(--card)" stroke-width="1.8"><title>Teacher · L1 Basics: 71.7%</title></circle>
+<text x="63.0" y="113.9" font-size="10.5" font-weight="600" fill="#dc2626" style="paint-order:stroke;stroke:var(--card);stroke-width:3px">72%</text>
+<circle cx="359.0" cy="326.0" r="4.6" fill="#dc2626" stroke="var(--card)" stroke-width="1.8"><title>Teacher · L2 Teacher-fails: 0.0%</title></circle>
+<text x="368.0" y="316.0" font-size="10.5" font-weight="600" fill="#dc2626" style="paint-order:stroke;stroke:var(--card);stroke-width:3px">0%</text>
+<circle cx="664.0" cy="326.0" r="4.6" fill="#dc2626" stroke="var(--card)" stroke-width="1.8"><title>Teacher · L3 Both-fail: 0.0%</title></circle>
+<text x="673.0" y="339.0" font-size="10.5" font-weight="600" fill="#dc2626" style="paint-order:stroke;stroke:var(--card);stroke-width:3px">0%</text>
+<circle cx="54.0" cy="44.0" r="4.6" fill="#2563eb" stroke="var(--card)" stroke-width="1.8"><title>Cloud · L1 Basics: 100.0%</title></circle>
+<text x="63.0" y="34.0" font-size="10.5" font-weight="600" fill="#2563eb" style="paint-order:stroke;stroke:var(--card);stroke-width:3px">100%</text>
+<circle cx="359.0" cy="49.9" r="4.6" fill="#2563eb" stroke="var(--card)" stroke-width="1.8"><title>Cloud · L2 Teacher-fails: 97.9%</title></circle>
+<text x="368.0" y="39.9" font-size="10.5" font-weight="600" fill="#2563eb" style="paint-order:stroke;stroke:var(--card);stroke-width:3px">98%</text>
+<circle cx="664.0" cy="79.2" r="4.6" fill="#2563eb" stroke="var(--card)" stroke-width="1.8"><title>Cloud · L3 Both-fail: 87.5%</title></circle>
+<text x="673.0" y="69.2" font-size="10.5" font-weight="600" fill="#2563eb" style="paint-order:stroke;stroke:var(--card);stroke-width:3px">88%</text>
+<line x1="678" y1="56" x2="702" y2="56" stroke="#94a3b8" stroke-width="3" stroke-linecap="round"/>
+<text x="708" y="60" font-size="12" fill="var(--text)">Base</text>
+<line x1="678" y1="80" x2="702" y2="80" stroke="#7c3aed" stroke-width="3" stroke-linecap="round"/>
+<text x="708" y="84" font-size="12" fill="var(--text)">A1 · Distilled</text>
+<line x1="678" y1="104" x2="702" y2="104" stroke="#16a34a" stroke-width="3" stroke-linecap="round"/>
+<text x="708" y="108" font-size="12" fill="var(--text)">B · RL</text>
+<line x1="678" y1="128" x2="702" y2="128" stroke="#d97706" stroke-width="3" stroke-linecap="round"/>
+<text x="708" y="132" font-size="12" fill="var(--text)">C · Hybrid</text>
+<line x1="678" y1="152" x2="702" y2="152" stroke="#dc2626" stroke-width="3" stroke-linecap="round"/>
+<text x="708" y="156" font-size="12" fill="var(--text)">Teacher</text>
+<line x1="678" y1="176" x2="702" y2="176" stroke="#2563eb" stroke-width="3" stroke-linecap="round"/>
+<text x="708" y="180" font-size="12" fill="var(--text)">Cloud</text>
+</svg>
+<!-- CHART:END layer-trend -->
+
+  <p>
+    <b>How to read this chart</b>: moving right along the horizontal axis, the questions get harder.
+    A healthy model should "decline slowly"; but <b>the A1 line falls off a cliff in the middle</b> (53% → 17%),
+    which shows it only learned what the teacher had taught it. Once the teacher can't do it either, A1 fails completely —
+    and on top of that it was dragged off course by the teacher's wrong approach.
+    By contrast, the B and C lines decline far more gently.
+  </p>
+
+  <h3>3.4 One more surprise: from 0 to 25% on L3</h3>
+
+  <p>
+    On the hardest tier — the questions "neither the big student nor the original small student <b>can solve</b>":
+    the original small student is at <b>0%</b>, while the two that practiced on their own reached <b>20.8% and 25.0%</b>.
+  </p>
+
+  <p>
+    This shows they <b>didn't get there by imitation</b> — no one had ever solved these questions, so there was nothing to imitate.
+    They <b>worked out, on their own, problem-solving ability the original simply doesn't have</b>.
+  </p>
+
+  <div class="verdict">
+    <h3>Summary in four lines</h3>
+    <ul>
+      <li><b>Copying helps on "questions the teacher can do"</b>: 53.3% beats the 48.3% of not studying, but only by a little.</li>
+      <li><b>Copying hurts on "questions the teacher can't do"</b>: it drops from 39.6% to 16.7% — it copied the teacher's mistakes along with everything else.</li>
+      <li><b>Practicing on your own is the real skill</b>: on questions the teacher can't solve, it reaches 56.2%, almost 1.5 times "not studying".</li>
+      <li><b>And it was "learned", not "copied"</b>: on the hardest tier it went from 0% to 20%+.</li>
+    </ul>
+  </div>
+
+  <h3>3.5 Are these gaps real? — Statistical testing</h3>
+
+  <p>
+    The numbers differ, but could it just be luck? We ran a <b>paired test</b> (comparing, question by question, who got each one right and who got it wrong):
+  </p>
+
+  <table>
+    <thead>
+      <tr><th>Comparison</th><th class="num">p-value</th><th>Conclusion</th></tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><b>Copying vs practicing on your own</b> (A1 vs B)</td>
+        <td class="num"><b>0.0018</b></td>
+        <td class="win">significant — practicing on your own is clearly better</td>
+      </tr>
+      <tr>
+        <td><b>Practicing on your own vs teacher</b> (B vs teacher)</td>
+        <td class="num"><b>0.0309</b></td>
+        <td class="win">significant — <b>the student overtook the teacher</b></td>
+      </tr>
+      <tr>
+        <td><b>Copy then practice vs teacher</b> (C vs teacher)</td>
+        <td class="num"><b>0.0309</b></td>
+        <td class="win">significant — <b>the student overtook the teacher</b></td>
+      </tr>
+      <tr>
+        <td>Copying vs teacher (A1 vs teacher)</td>
+        <td class="num dim">0.7266</td>
+        <td class="dim">not significant — copying did not overtake the teacher</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <p class="muted" style="font-size:14px">
+    A p-value below 0.05 is usually taken as "unlikely to be luck". The top three rows pass,
+    the last one doesn't — and that's exactly the dividing line we were looking for.
+  </p>
+
+  <div class="warn">
+    <p>
+      <b>For honesty's sake, two things must be said:</b><br>
+      ① This tier has only <b>16 questions</b>, so the sample is on the small side. The direction is very clear and the statistical test did reach "significant",
+      but stronger evidence would need the question pool enlarged 2–3 times and the study redone.<br>
+      ② The top cloud model (DeepSeek V4 Pro) scores <b>97.9%</b> on this tier.
+      So although the small model overtook its own teacher, <b>it is still very far from a truly strong model</b>.
+    </p>
+  </div>
+
+  <h2>4. How the whole plan unfolded</h2>
+
+  <p class="muted">From first step to conclusion, about 40 hours of machine time, split into two big rounds.</p>
+
+  <div class="tl">
+    <div class="tl-item done">
+      <b>Step 1 · Question generation and screening</b>
+      <span>Automatically generate math problems → have the big student and the original small student each solve them 5 times → split into L1/L2/L3 by "who can and who can't" (about 7 hours — the most time-consuming step)</span>
+    </div>
+    <div class="tl-item done">
+      <b>Step 2 · Lock the exam</b>
+      <span>Freeze the 52 questions into an "exam" that no training is allowed to touch afterward — to keep the test fair</span>
+    </div>
+    <div class="tl-item done">
+      <b>Step 3 · Train A1 (copied the big student)</b>
+      <span>1 hour 27 minutes</span>
+    </div>
+    <div class="tl-item done">
+      <b>Step 4 · Train B (practiced on its own)</b>
+      <span>3 hours 50 minutes — the slowest step, because each question had to be solved 8 times on the spot before summarizing</span>
+    </div>
+    <div class="tl-item done">
+      <b>Step 5 · Train C (copied then practiced)</b>
+      <span>2 hours 30 minutes</span>
+    </div>
+    <div class="tl-item done">
+      <b>Step 6 · The uniform exam</b>
+      <span>6 roles × 52 questions × 3 attempts each = 936 responses, about 3.5 hours total</span>
+    </div>
+    <div class="tl-item done">
+      <b>Step 7 · Produce the report</b>
+      <span>Automatically compiled into charts and conclusions</span>
+    </div>
+  </div>
+
+  <p>
+    There was one mishap along the way — during the first exam, because of a programming oversight,
+    <b>only the basics (L1) made it into the exam, and neither of the two hardest tiers was tested at all</b>.
+    So we ran a make-up exam (about 1 hour 11 minutes), and only then had this complete set of results.
+  </p>
+
+  <h2>5. Where the files are</h2>
+
+  <p>
+    The project lives at <span class="kbd">Desktop → AI → Local-Model-Lab</span>.
+    Neatly sorted — one glance and you get it:
+  </p>
+
+<pre class="tree">
+<b>Local-Model-Lab/</b>
+│
+├── <b>base/</b>                  <i>original small student (4.3 GB, read-only, never modified)</i>
+│
+├── <b>branch-A-distill/</b>      <i>everything on the "copy the homework" branch</i>
+│   └── adapter-A1/           <i>★ training output: A1's "adapter" (67 MB)</i>
+│
+├── <b>branch-B-rl/</b>           <i>everything on the "practice on your own" branch</i>
+│   ├── adapter-B/            <i>★ training output: B's "adapter" (67 MB)</i>
+│   ├── adapter-C/            <i>★ training output: C's "adapter" (67 MB)</i>
+│   └── data/                 <i>the question bank used for practice</i>
+│
+├── <b>shared/</b>                <i>shared by both branches</i>
+│   ├── results/
+│   │   ├── 横评报告.html      <i>★ the full evaluation report (open in a browser)</i>
+│   │   ├── 横评报告.md
+│   │   ├── eval_metrics.json  <i>summary of every metric</i>
+│   │   └── eval_raw.jsonl     <i>1014 raw answer records</i>
+│   └── bench_stratified.jsonl <i>★ the frozen exam (52 questions)</i>
+│
+├── <b>scripts/</b>               <i>all the programs</i>
+│   ├── progress.sh           <i>★ check progress (most used)</i>
+│   ├── labctl.sh             <i>★ pause / resume</i>
+│   ├── 09~12 · question generation and screening
+│   ├── 11 · train A1 (distillation)
+│   ├── 20 · train B/C (reinforcement learning)
+│   ├── 30 · evaluation
+│   └── 31 · generate report
+│
+├── <b>docs/</b>                  <i>notes</i>
+│   ├── 原理笔记.md            <i>technical fundamentals</i>
+│   ├── 踩坑记录.md            <i>24 pitfalls we hit</i>
+│   └── 经验教训总纲.md        <i>★ the distilled general lessons</i>
+│
+├── <b>configs/</b>               <i>every parameter setting (change these to change the experiment)</i>
+├── <b>logs/</b>                  <i>run logs</i>
+├── <b>backup/</b>                <i>backups</i>
+│
+├── <b>README.md</b>              <i>the spec for technical readers</i>
+├── <b>完整计划.md</b>            <i>the original full plan</i>
+├── <b>成果展示.md</b>            <i>the first round's results</i>
+└── <b>项目全貌.html / .md</b>    <i>★ the very page you're reading</i>
+</pre>
+
+  <p>
+    There's also a shortcuts folder for the results on the Desktop,
+    <span class="kbd">本地模型实验室-成果</span>,
+    holding shortcuts to the trained models and the report — double-click and you're there, no drilling down through folders.
+  </p>
+
+  <div class="warn">
+    <p>
+      <b>About those three "adapter" files:</b> each is only 67 MB —
+      a small layer of tweaks added on top of the original model (technically called <b>LoRA</b>),
+      <b>not a complete model</b>. To use them, you must pair them with the original model in <span class="kbd">base/</span>.
+      Double-clicking the folder directly just shows a few <span class="kbd">.safetensors</span> files — that's normal.
+    </p>
+  </div>
+
+  <h2>6. A few terms, explained in one sentence</h2>
+
+  <div class="gloss">
+    <div class="gloss-item">
+      <b>Distillation</b>
+      <span>Have the small model imitate the big model's output. Equivalent to "copying the worked solutions". What it learns is <b>whether it looks alike</b>.</span>
+    </div>
+    <div class="gloss-item">
+      <b>Reinforcement learning</b>
+      <span>Let the model try things on its own and adjust by how good the result is. Equivalent to "solving problems and checking your own answers". What it learns is <b>whether it is right</b>.</span>
+    </div>
+    <div class="gloss-item">
+      <b>LoRA (adapter)</b>
+      <span>Leave the original model untouched; just add a very small layer of adjustable parameters alongside it. Saves memory, and it's easy to swap in and out.</span>
+    </div>
+    <div class="gloss-item">
+      <b>teacher / student</b>
+      <span>teacher model / student model. Here the teacher is 9B and the student is 2B (more parameters usually means smarter).</span>
+    </div>
+    <div class="gloss-item">
+      <b>Consistency</b>
+      <span>How similar the answering style is to the teacher's. <b>The homework-copier has especially high consistency</b> (61%), but knowing how to do something isn't the same as getting it right.</span>
+    </div>
+    <div class="gloss-item">
+      <b>Diversity</b>
+      <span>Whether the same question gets the same answer every time, or different lines of thinking. Too low means rote memorization.</span>
+    </div>
+  </div>
+
+  <footer>
+    <p>
+      Project location: <span class="kbd">~/Desktop/AI/Local-Model-Lab</span> ｜
+      Evaluation scale: 6 roles × 52 questions × 3 samples = 936 responses (plus 78 probe runs)
+    </p>
+    <p>
+      Everything was done CPU-only on a single 2018 Intel MacBook Pro (i7-8850H / 16GB / no discrete GPU).
+      The cloud baseline runs over the network and uses no local memory.
+    </p>
+  </footer>
+
+</div>
+</body>
+</html>

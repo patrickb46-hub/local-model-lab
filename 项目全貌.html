@@ -1,0 +1,732 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>项目全貌 · 一个 AI 学生能不能超过它的老师</title>
+<style>
+  :root{
+    --bg:#f6f8fb; --card:#ffffff; --text:#1e293b; --muted:#64748b;
+    --line:#e2e8f0; --blue:#2563eb; --blue-bg:#eff6ff;
+    --green:#16a34a; --green-bg:#f0fdf4;
+    --red:#dc2626; --red-bg:#fef2f2;
+    --amber:#d97706; --amber-bg:#fffbeb;
+    --purple:#7c3aed; --purple-bg:#faf5ff;
+    --shadow:0 1px 3px rgba(15,23,42,.06),0 8px 24px rgba(15,23,42,.06);
+  }
+  @media (prefers-color-scheme: dark){
+    :root{
+      --bg:#0b1220; --card:#141e30; --text:#e5edf8; --muted:#94a3b8;
+      --line:#25324a; --blue:#60a5fa; --blue-bg:#152447;
+      --green:#4ade80; --green-bg:#12291d;
+      --red:#f87171; --red-bg:#2a1517;
+      --amber:#fbbf24; --amber-bg:#2a2110;
+      --purple:#a78bfa; --purple-bg:#221a3a;
+      --shadow:0 1px 3px rgba(0,0,0,.4),0 8px 24px rgba(0,0,0,.3);
+    }
+  }
+  *{box-sizing:border-box}
+  body{
+    margin:0; background:var(--bg); color:var(--text);
+    font:16px/1.75 -apple-system,BlinkMacSystemFont,"PingFang SC","Hiragino Sans GB","Microsoft YaHei",sans-serif;
+    -webkit-font-smoothing:antialiased;
+  }
+  .wrap{max-width:960px;margin:0 auto;padding:0 24px 80px}
+  header{
+    background:linear-gradient(135deg,#1e40af,#3b82f6 55%,#60a5fa);
+    color:#fff; padding:56px 0 48px; margin-bottom:36px;
+  }
+  header .wrap{padding-bottom:0}
+  header h1{margin:0 0 12px;font-size:34px;line-height:1.35;letter-spacing:-.5px}
+  header .sub{font-size:17px;opacity:.94;margin:0}
+  header .meta{margin-top:22px;font-size:13px;opacity:.8}
+
+  h2{
+    font-size:23px;margin:52px 0 18px;padding-bottom:10px;
+    border-bottom:2px solid var(--line);letter-spacing:-.3px;
+  }
+  h3{font-size:17px;margin:30px 0 12px}
+  p{margin:0 0 14px}
+  .muted{color:var(--muted)}
+
+  .card{
+    background:var(--card);border:1px solid var(--line);border-radius:14px;
+    padding:22px 24px;box-shadow:var(--shadow);margin:18px 0;
+  }
+  .hero{
+    background:var(--blue-bg);border:1px solid var(--blue);
+    border-left:6px solid var(--blue);border-radius:12px;padding:22px 26px;margin:24px 0;
+  }
+  .hero p{margin:0;font-size:18px;line-height:1.8}
+  .hero strong{color:var(--blue)}
+
+  table{width:100%;border-collapse:collapse;margin:16px 0;font-size:15px}
+  th,td{padding:11px 12px;text-align:left;border-bottom:1px solid var(--line)}
+  th{font-size:13px;color:var(--muted);font-weight:600;text-transform:none}
+  tbody tr:hover{background:var(--blue-bg)}
+  td.num,th.num{text-align:right;font-variant-numeric:tabular-nums}
+  .win{font-weight:700;color:var(--green)}
+  .lose{color:var(--red)}
+  .dim{color:var(--muted)}
+
+  .grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin:20px 0}
+  @media(max-width:760px){.grid3{grid-template-columns:1fr}}
+  .method{
+    background:var(--card);border:1px solid var(--line);border-radius:14px;
+    padding:20px;box-shadow:var(--shadow);border-top:4px solid var(--line);
+  }
+  .method.a{border-top-color:var(--purple)}
+  .method.b{border-top-color:var(--green)}
+  .method.c{border-top-color:var(--amber)}
+  .method h4{margin:0 0 6px;font-size:16px}
+  .method .tag{
+    display:inline-block;font-size:12px;padding:2px 9px;border-radius:99px;
+    margin-bottom:10px;font-weight:600;
+  }
+  .method.a .tag{background:var(--purple-bg);color:var(--purple)}
+  .method.b .tag{background:var(--green-bg);color:var(--green)}
+  .method.c .tag{background:var(--amber-bg);color:var(--amber)}
+  .method p{margin:8px 0 0;font-size:14px;color:var(--muted);line-height:1.7}
+
+  /* 三层阶梯 */
+  .layers{margin:22px 0}
+  .layer{
+    display:flex;align-items:center;gap:18px;padding:16px 20px;margin:10px 0;
+    background:var(--card);border:1px solid var(--line);border-radius:12px;
+    border-left:6px solid var(--line);
+  }
+  .layer.l1{border-left-color:var(--green)}
+  .layer.l2{border-left-color:var(--red);background:var(--red-bg)}
+  .layer.l3{border-left-color:var(--purple)}
+  .layer .badge{
+    flex:0 0 auto;font-size:15px;font-weight:800;width:44px;height:44px;
+    display:flex;align-items:center;justify-content:center;border-radius:11px;
+    background:var(--bg);border:1px solid var(--line);
+  }
+  .layer .body{flex:1}
+  .layer .body b{display:block;font-size:15px;margin-bottom:3px}
+  .layer .body span{font-size:14px;color:var(--muted)}
+  .layer .num{flex:0 0 auto;font-size:14px;color:var(--muted);text-align:right}
+
+  /* 条形图 */
+  .bars{margin:18px 0}
+  .bar-row{display:flex;align-items:center;gap:12px;margin:9px 0;font-size:14px}
+  .bar-row .name{flex:0 0 108px;color:var(--muted)}
+  .bar-track{flex:1;height:26px;background:var(--bg);border-radius:7px;overflow:hidden;position:relative;border:1px solid var(--line)}
+  .bar-fill{height:100%;border-radius:6px;display:flex;align-items:center;justify-content:flex-end;padding-right:8px;font-size:13px;font-weight:700;color:#fff;transition:width .3s}
+  .bar-fill.z{justify-content:flex-start;padding-left:8px;color:var(--muted);font-weight:600}
+
+  .verdict{
+    background:var(--green-bg);border:1px solid var(--green);border-left:6px solid var(--green);
+    border-radius:12px;padding:22px 26px;margin:24px 0;
+  }
+  .verdict h3{margin:0 0 12px;color:var(--green);font-size:18px}
+  .verdict ul{margin:0;padding-left:22px}
+  .verdict li{margin:9px 0}
+  .warn{
+    background:var(--amber-bg);border:1px solid var(--amber);border-left:6px solid var(--amber);
+    border-radius:12px;padding:18px 24px;margin:20px 0;
+  }
+  .warn p{margin:0;font-size:15px}
+
+  /* 时间线 */
+  .tl{margin:20px 0;border-left:3px solid var(--line);padding-left:0}
+  .tl-item{position:relative;padding:0 0 20px 30px}
+  .tl-item::before{
+    content:'';position:absolute;left:-9px;top:6px;width:15px;height:15px;
+    border-radius:50%;background:var(--card);border:3px solid var(--blue);
+  }
+  .tl-item.done::before{background:var(--green);border-color:var(--green)}
+  .tl-item b{display:block;font-size:15px}
+  .tl-item span{font-size:13px;color:var(--muted)}
+
+  /* 文件树 */
+  pre.tree{
+    background:var(--card);border:1px solid var(--line);border-radius:12px;
+    padding:20px 22px;overflow-x:auto;font-size:13.5px;line-height:1.85;
+    font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;margin:16px 0;
+  }
+  pre.tree b{color:var(--blue)}
+  pre.tree i{color:var(--muted);font-style:normal}
+
+  .gloss{display:grid;grid-template-columns:repeat(2,1fr);gap:14px;margin:18px 0}
+  @media(max-width:760px){.gloss{grid-template-columns:1fr}}
+  .gloss-item{background:var(--card);border:1px solid var(--line);border-radius:11px;padding:15px 18px}
+  .gloss-item b{display:block;font-size:15px;margin-bottom:5px;color:var(--blue)}
+  .gloss-item span{font-size:14px;color:var(--muted);line-height:1.7}
+
+  footer{margin-top:60px;padding-top:24px;border-top:1px solid var(--line);font-size:13px;color:var(--muted)}
+  .kbd{background:var(--bg);border:1px solid var(--line);border-radius:5px;padding:1px 7px;font-size:13px;font-family:ui-monospace,Menlo,monospace}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="wrap">
+    <h1>一个 AI 学生，能不能超过它的老师？</h1>
+    <p class="sub">本地模型实验室 · 蒸馏 vs 强化学习 对照实验</p>
+    <p class="meta">2026 年 10 月 ｜ 全部流程在一台 2018 款 Intel MacBook Pro 上纯 CPU 跑完 ｜ 不联网也能复现</p>
+  </div>
+</header>
+
+<div class="wrap">
+
+  <div class="hero">
+    <p>
+      <strong>结论先说：能。</strong>
+      在<b>「老师自己也不会做」</b>的题目上，
+      用<b>自己刷题（强化学习）</b>练出来的小模型能做到 <strong>56%</strong>，
+      而<b>抄老师解题过程（蒸馏）</b>练出来的不但没进步，
+      反而从原来的 40% <strong>退步到 17%</strong>。
+    </p>
+  </div>
+
+  <h2>一、这是一件什么事</h2>
+
+  <p>
+    打个比方。有一个<b>小学生</b>（一个小型 AI 模型），要练数学。
+    他旁边有一个<b>大学生</b>（一个更大的 AI 模型），水平比他高。
+  </p>
+
+  <p>
+    现在有两种练法：
+  </p>
+
+  <div class="grid3">
+    <div class="method a">
+      <span class="tag">练法一 · 蒸馏</span>
+      <h4>抄大学生的解题过程</h4>
+      <p>小学生把大学生怎么一步步解题、怎么下笔，全抄一遍。抄得多了，思路就变得像大学生。</p>
+    </div>
+    <div class="method b">
+      <span class="tag">练法二 · 强化学习</span>
+      <h4>自己做题，自己对答案</h4>
+      <p>没人教。小学生自己做题，做完对答案，做对了就记住这个思路，做错了就调整。反复几十轮。</p>
+    </div>
+    <div class="method c">
+      <span class="tag">练法三 · 先抄后练</span>
+      <h4>先抄一遍，再自己做题</h4>
+      <p>两条路都用上：先抄大学生的解题过程打底，然后自己刷题。</p>
+    </div>
+  </div>
+
+  <p>
+    这三种练法，分别对应项目里的三个实验对象：<b>A1</b>（蒸馏）、<b>B</b>（强化学习）、<b>C</b>（先蒸馏再强化学习）。
+    另外还有两个参照：<b>base</b>（小学生原版，什么都不练）和 <b>teacher</b>（大学生本人）。
+  </p>
+
+  <div class="warn">
+    <p>
+      <b>为什么不直接训练那个"大学生"？</b>
+      因为这台电脑只有 16GB 内存、没有独立显卡 —— 训练大学生（9B 参数）在物理上做不到。
+      所以我们只训练小学生，把他练强，看能不能顶上去。
+    </p>
+  </div>
+
+  <h2>二、关键设计：把题目分成三层</h2>
+
+  <p>
+    这是整个实验里最重要的一步设计。题目不能随便出 ——
+    <b>必须出成三档，才能测出「到底是学会了，还是抄会了」。</b>
+  </p>
+
+  <div class="layers">
+    <div class="layer l1">
+      <div class="badge">L1</div>
+      <div class="body">
+        <b>大学生也会做的题（基础题）</b>
+        <span>20 道。用来测基本功有没有退步。</span>
+      </div>
+      <div class="num">20 题</div>
+    </div>
+    <div class="layer l2">
+      <div class="badge">L2</div>
+      <div class="body">
+        <b>大学生自己也不会做的题 ← 这一层最关键</b>
+        <span>16 道。原版小学生反而偶尔能做对几道。</span>
+      </div>
+      <div class="num">16 题</div>
+    </div>
+    <div class="layer l3">
+      <div class="badge">L3</div>
+      <div class="body">
+        <b>大学生和原版小学生都不会做的题</b>
+        <span>16 道。用来测「有没有学到全新的本事」。</span>
+      </div>
+      <div class="num">16 题</div>
+    </div>
+  </div>
+
+  <p>
+    <b>为什么 L2 最关键？</b>
+    因为如果只在"大学生会的题"上比，抄作业的人一定赢 —— 他抄的就是那些。
+    只有在<b>大学生自己也不会的题</b>上，才能看出一个人<b>是真的会思考，还是只会模仿</b>。
+  </p>
+
+  <p class="muted">
+    这些题不是随便找的，而是程序自动生成的数学题，答案唯一、百分百好判对错 ——
+    这样就不存在"评分标准有争议"的问题，结果完全客观。
+  </p>
+
+  <h2>三、结果</h2>
+
+  <h3>3.1 总分</h3>
+  <p class="muted">下面是各角色在全部 52 道题上的平均得分（每道题答 3 次取平均）。</p>
+
+  <table>
+    <thead>
+      <tr>
+        <th>角色</th>
+        <th class="num">总分</th>
+        <th class="num">L1 基础题</th>
+        <th class="num">L2 老师不会的</th>
+        <th class="num">L3 都不会的</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>base · 小学生原版</td>
+        <td class="num">30.8%</td><td class="num">48.3%</td>
+        <td class="num dim">39.6%</td><td class="num dim">0.0%</td>
+      </tr>
+      <tr>
+        <td>A1 · 抄大学生</td>
+        <td class="num">28.2%</td><td class="num">53.3%</td>
+        <td class="num lose">16.7%</td><td class="num">8.3%</td>
+      </tr>
+      <tr>
+        <td><b>B · 自己刷题</b></td>
+        <td class="num"><b>49.4%</b></td><td class="num">66.7%</td>
+        <td class="num win">56.2%</td><td class="num win">20.8%</td>
+      </tr>
+      <tr>
+        <td><b>C · 先抄后刷</b></td>
+        <td class="num"><b>51.3%</b></td><td class="num">70.0%</td>
+        <td class="num win">54.2%</td><td class="num win">25.0%</td>
+      </tr>
+      <tr>
+        <td>teacher · 大学生本人</td>
+        <td class="num">27.6%</td><td class="num">71.7%</td>
+        <td class="num dim">0.0%</td><td class="num dim">0.0%</td>
+      </tr>
+      <tr>
+        <td>dsv4pro · 云端顶级模型</td>
+        <td class="num">95.5%</td><td class="num">100%</td>
+        <td class="num">97.9%</td><td class="num">87.5%</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <p class="muted" style="font-size:14px">
+    注：L2 这一层是<b>按定义</b>挑出来的"大学生全部做错"的题，所以大学生在 L2 上必然是 0% ——
+    这正好说明这一层的筛选是严格做到的。
+  </p>
+
+  <!-- CHART:BEGIN grouped-bars -->
+<svg viewBox="0 0 760 380" width="100%" role="img" aria-label="各角色在三个难度层上的正确率对比" style="display:block;margin:6px 0 2px">
+<rect x="54" y="14" width="13" height="13" rx="3" fill="#22c55e"/>
+<text x="73" y="25" font-size="13" fill="var(--muted)">L1 基础题</text>
+<rect x="180" y="14" width="13" height="13" rx="3" fill="#dc2626"/>
+<text x="199" y="25" font-size="13" fill="var(--muted)">L2 老师不会</text>
+<rect x="319" y="14" width="13" height="13" rx="3" fill="#8b5cf6"/>
+<text x="338" y="25" font-size="13" fill="var(--muted)">L3 都不会</text>
+<line x1="54" y1="318.0" x2="742" y2="318.0" stroke="var(--line)" stroke-width="1" />
+<text x="45" y="322.0" font-size="11" fill="var(--muted)" text-anchor="end">0%</text>
+<line x1="54" y1="250.0" x2="742" y2="250.0" stroke="var(--line)" stroke-width="1" />
+<text x="45" y="254.0" font-size="11" fill="var(--muted)" text-anchor="end">25%</text>
+<line x1="54" y1="182.0" x2="742" y2="182.0" stroke="var(--line)" stroke-width="1" />
+<text x="45" y="186.0" font-size="11" fill="var(--muted)" text-anchor="end">50%</text>
+<line x1="54" y1="114.0" x2="742" y2="114.0" stroke="var(--line)" stroke-width="1" />
+<text x="45" y="118.0" font-size="11" fill="var(--muted)" text-anchor="end">75%</text>
+<line x1="54" y1="46.0" x2="742" y2="46.0" stroke="var(--line)" stroke-width="1" />
+<text x="45" y="50.0" font-size="11" fill="var(--muted)" text-anchor="end">100%</text>
+<rect x="65.3" y="186.5" width="26" height="131.5" rx="3" fill="#22c55e" opacity="0.92"><title>原版 · L1 基础题：48.3%</title></rect>
+<text x="78.3" y="182.5" font-size="10.5" fill="var(--text)" text-anchor="middle">48</text>
+<rect x="98.3" y="210.3" width="26" height="107.7" rx="3" fill="#dc2626" opacity="0.92"><title>原版 · L2 老师不会：39.6%</title></rect>
+<text x="111.3" y="206.3" font-size="10.5" fill="var(--text)" text-anchor="middle">40</text>
+<rect x="131.3" y="318.0" width="26" height="1.0" rx="3" fill="#8b5cf6" opacity="0.92"><title>原版 · L3 都不会：0.0%</title></rect>
+<text x="144.3" y="312.0" font-size="10" fill="var(--muted)" text-anchor="middle">0</text>
+<text x="111.3" y="338.0" font-size="12.5" fill="var(--text)" text-anchor="middle">原版</text>
+<rect x="180.0" y="172.9" width="26" height="145.1" rx="3" fill="#22c55e" opacity="0.92"><title>A1 蒸馏 · L1 基础题：53.3%</title></rect>
+<text x="193.0" y="168.9" font-size="10.5" fill="var(--text)" text-anchor="middle">53</text>
+<rect x="213.0" y="272.7" width="26" height="45.3" rx="3" fill="#dc2626" opacity="0.92"><title>A1 蒸馏 · L2 老师不会：16.7%</title></rect>
+<text x="226.0" y="268.7" font-size="10.5" fill="var(--text)" text-anchor="middle">17</text>
+<rect x="246.0" y="295.3" width="26" height="22.7" rx="3" fill="#8b5cf6" opacity="0.92"><title>A1 蒸馏 · L3 都不会：8.3%</title></rect>
+<text x="259.0" y="291.3" font-size="10.5" fill="var(--text)" text-anchor="middle">8</text>
+<text x="226.0" y="338.0" font-size="12.5" fill="var(--text)" text-anchor="middle">A1 蒸馏</text>
+<rect x="294.7" y="136.7" width="26" height="181.3" rx="3" fill="#22c55e" opacity="0.92"><title>B 强化 · L1 基础题：66.7%</title></rect>
+<text x="307.7" y="132.7" font-size="10.5" fill="var(--text)" text-anchor="middle">67</text>
+<rect x="327.7" y="165.0" width="26" height="153.0" rx="3" fill="#dc2626" opacity="0.92"><title>B 强化 · L2 老师不会：56.2%</title></rect>
+<text x="340.7" y="161.0" font-size="10.5" fill="var(--text)" text-anchor="middle">56</text>
+<rect x="360.7" y="261.3" width="26" height="56.7" rx="3" fill="#8b5cf6" opacity="0.92"><title>B 强化 · L3 都不会：20.8%</title></rect>
+<text x="373.7" y="257.3" font-size="10.5" fill="var(--text)" text-anchor="middle">21</text>
+<text x="340.7" y="338.0" font-size="12.5" fill="var(--text)" text-anchor="middle">B 强化</text>
+<rect x="409.3" y="127.6" width="26" height="190.4" rx="3" fill="#22c55e" opacity="0.92"><title>C 混合 · L1 基础题：70.0%</title></rect>
+<text x="422.3" y="123.6" font-size="10.5" fill="var(--text)" text-anchor="middle">70</text>
+<rect x="442.3" y="170.7" width="26" height="147.3" rx="3" fill="#dc2626" opacity="0.92"><title>C 混合 · L2 老师不会：54.2%</title></rect>
+<text x="455.3" y="166.7" font-size="10.5" fill="var(--text)" text-anchor="middle">54</text>
+<rect x="475.3" y="250.0" width="26" height="68.0" rx="3" fill="#8b5cf6" opacity="0.92"><title>C 混合 · L3 都不会：25.0%</title></rect>
+<text x="488.3" y="246.0" font-size="10.5" fill="var(--text)" text-anchor="middle">25</text>
+<text x="455.3" y="338.0" font-size="12.5" fill="var(--text)" text-anchor="middle">C 混合</text>
+<rect x="524.0" y="123.1" width="26" height="194.9" rx="3" fill="#22c55e" opacity="0.92"><title>老师 · L1 基础题：71.7%</title></rect>
+<text x="537.0" y="119.1" font-size="10.5" fill="var(--text)" text-anchor="middle">72</text>
+<rect x="557.0" y="318.0" width="26" height="1.0" rx="3" fill="#dc2626" opacity="0.92"><title>老师 · L2 老师不会：0.0%</title></rect>
+<text x="570.0" y="312.0" font-size="10" fill="var(--muted)" text-anchor="middle">0</text>
+<rect x="590.0" y="318.0" width="26" height="1.0" rx="3" fill="#8b5cf6" opacity="0.92"><title>老师 · L3 都不会：0.0%</title></rect>
+<text x="603.0" y="312.0" font-size="10" fill="var(--muted)" text-anchor="middle">0</text>
+<text x="570.0" y="338.0" font-size="12.5" fill="var(--text)" text-anchor="middle">老师</text>
+<rect x="638.7" y="46.0" width="26" height="272.0" rx="3" fill="#22c55e" opacity="0.92"><title>云端 · L1 基础题：100.0%</title></rect>
+<text x="651.7" y="42.0" font-size="10.5" fill="var(--text)" text-anchor="middle">100</text>
+<rect x="671.7" y="51.7" width="26" height="266.3" rx="3" fill="#dc2626" opacity="0.92"><title>云端 · L2 老师不会：97.9%</title></rect>
+<text x="684.7" y="47.7" font-size="10.5" fill="var(--text)" text-anchor="middle">98</text>
+<rect x="704.7" y="80.0" width="26" height="238.0" rx="3" fill="#8b5cf6" opacity="0.92"><title>云端 · L3 都不会：87.5%</title></rect>
+<text x="717.7" y="76.0" font-size="10.5" fill="var(--text)" text-anchor="middle">88</text>
+<text x="684.7" y="338.0" font-size="12.5" fill="var(--text)" text-anchor="middle">云端</text>
+<line x1="54" y1="318" x2="742" y2="318" stroke="var(--line)" stroke-width="1.5"/>
+</svg>
+<!-- CHART:END grouped-bars -->
+
+  <p class="muted" style="font-size:14px">
+    柱子越高越好。<b>红色那根（L2）是全场的关键</b> ——
+    抄作业的 A1 在红柱上是全场唯一的"比不学还矮"。
+  </p>
+
+  <h3>3.2 关键的一张图：L2 上的表现</h3>
+
+  <div class="bars">
+    <div class="bar-row">
+      <div class="name">大学生本人</div>
+      <div class="bar-track"><div class="bar-fill z" style="width:2%">0%</div></div>
+    </div>
+    <div class="bar-row">
+      <div class="name">原版小学生</div>
+      <div class="bar-track"><div class="bar-fill" style="width:39.6%;background:var(--muted)">39.6%</div></div>
+    </div>
+    <div class="bar-row">
+      <div class="name">A1 抄大学生</div>
+      <div class="bar-track"><div class="bar-fill" style="width:16.7%;background:var(--red)">16.7%</div></div>
+    </div>
+    <div class="bar-row">
+      <div class="name"><b>B 自己刷题</b></div>
+      <div class="bar-track"><div class="bar-fill" style="width:56.2%;background:var(--green)">56.2%</div></div>
+    </div>
+    <div class="bar-row">
+      <div class="name"><b>C 先抄后刷</b></div>
+      <div class="bar-track"><div class="bar-fill" style="width:54.2%;background:var(--green)">54.2%</div></div>
+    </div>
+  </div>
+
+  <p>
+    一眼就能看出来：<b>抄作业的那个，是全场唯一比"不学"还差的。</b>
+  </p>
+
+  <h3>3.3 换个角度看：从基础题到难题，谁在往下掉？</h3>
+
+  <p>
+    把三层题按难度依次排开，看每个角色一路走下来的走势 ——
+    折线图比表格更直观：<b>该平的平，该掉的掉</b>。
+  </p>
+
+  <!-- CHART:BEGIN layer-trend -->
+<svg viewBox="0 0 760 422" width="100%" role="img" aria-label="各角色从基础题到难题的走势" style="display:block;margin:6px 0 2px">
+<line x1="54" y1="326.0" x2="664" y2="326.0" stroke="var(--line)"/>
+<text x="45" y="330.0" font-size="11" fill="var(--muted)" text-anchor="end">0%</text>
+<line x1="54" y1="255.5" x2="664" y2="255.5" stroke="var(--line)"/>
+<text x="45" y="259.5" font-size="11" fill="var(--muted)" text-anchor="end">25%</text>
+<line x1="54" y1="185.0" x2="664" y2="185.0" stroke="var(--line)"/>
+<text x="45" y="189.0" font-size="11" fill="var(--muted)" text-anchor="end">50%</text>
+<line x1="54" y1="114.5" x2="664" y2="114.5" stroke="var(--line)"/>
+<text x="45" y="118.5" font-size="11" fill="var(--muted)" text-anchor="end">75%</text>
+<line x1="54" y1="44.0" x2="664" y2="44.0" stroke="var(--line)"/>
+<text x="45" y="48.0" font-size="11" fill="var(--muted)" text-anchor="end">100%</text>
+<text x="54.0" y="376.0" font-size="12.5" fill="var(--text)" text-anchor="middle">L1 基础题</text>
+<text x="359.0" y="376.0" font-size="12.5" fill="var(--text)" text-anchor="middle">L2 老师不会</text>
+<text x="664.0" y="376.0" font-size="12.5" fill="var(--text)" text-anchor="middle">L3 都不会</text>
+<line x1="54" y1="326" x2="664" y2="326" stroke="var(--line)" stroke-width="1.5"/>
+<polyline points="54.0,189.7 359.0,214.4 664.0,326.0" fill="none" stroke="#94a3b8" stroke-width="2.6" stroke-linejoin="round" stroke-linecap="round" opacity="0.95"/>
+<polyline points="54.0,175.6 359.0,279.0 664.0,302.5" fill="none" stroke="#7c3aed" stroke-width="2.6" stroke-linejoin="round" stroke-linecap="round" opacity="0.95"/>
+<polyline points="54.0,138.0 359.0,167.4 664.0,267.2" fill="none" stroke="#16a34a" stroke-width="2.6" stroke-linejoin="round" stroke-linecap="round" opacity="0.95"/>
+<polyline points="54.0,128.6 359.0,173.2 664.0,255.5" fill="none" stroke="#d97706" stroke-width="2.6" stroke-linejoin="round" stroke-linecap="round" opacity="0.95"/>
+<polyline points="54.0,123.9 359.0,326.0 664.0,326.0" fill="none" stroke="#dc2626" stroke-width="2.6" stroke-linejoin="round" stroke-linecap="round" opacity="0.95"/>
+<polyline points="54.0,44.0 359.0,49.9 664.0,79.2" fill="none" stroke="#2563eb" stroke-width="2.6" stroke-linejoin="round" stroke-linecap="round" opacity="0.95"/>
+<circle cx="54.0" cy="189.7" r="4.6" fill="#94a3b8" stroke="var(--card)" stroke-width="1.8"><title>原版 · L1 基础题：48.3%</title></circle>
+<text x="63.0" y="215.7" font-size="10.5" font-weight="600" fill="#94a3b8" style="paint-order:stroke;stroke:var(--card);stroke-width:3px">48%</text>
+<circle cx="359.0" cy="214.4" r="4.6" fill="#94a3b8" stroke="var(--card)" stroke-width="1.8"><title>原版 · L2 老师不会：39.6%</title></circle>
+<text x="368.0" y="227.4" font-size="10.5" font-weight="600" fill="#94a3b8" style="paint-order:stroke;stroke:var(--card);stroke-width:3px">40%</text>
+<circle cx="664.0" cy="326.0" r="4.6" fill="#94a3b8" stroke="var(--card)" stroke-width="1.8"><title>原版 · L3 都不会：0.0%</title></circle>
+<text x="673.0" y="352.0" font-size="10.5" font-weight="600" fill="#94a3b8" style="paint-order:stroke;stroke:var(--card);stroke-width:3px">0%</text>
+<circle cx="54.0" cy="175.6" r="4.6" fill="#7c3aed" stroke="var(--card)" stroke-width="1.8"><title>A1 蒸馏 · L1 基础题：53.3%</title></circle>
+<text x="63.0" y="188.6" font-size="10.5" font-weight="600" fill="#7c3aed" style="paint-order:stroke;stroke:var(--card);stroke-width:3px">53%</text>
+<circle cx="359.0" cy="279.0" r="4.6" fill="#7c3aed" stroke="var(--card)" stroke-width="1.8"><title>A1 蒸馏 · L2 老师不会：16.7%</title></circle>
+<text x="368.0" y="269.0" font-size="10.5" font-weight="600" fill="#7c3aed" style="paint-order:stroke;stroke:var(--card);stroke-width:3px">17%</text>
+<circle cx="664.0" cy="302.5" r="4.6" fill="#7c3aed" stroke="var(--card)" stroke-width="1.8"><title>A1 蒸馏 · L3 都不会：8.3%</title></circle>
+<text x="673.0" y="315.5" font-size="10.5" font-weight="600" fill="#7c3aed" style="paint-order:stroke;stroke:var(--card);stroke-width:3px">8%</text>
+<circle cx="54.0" cy="138.0" r="4.6" fill="#16a34a" stroke="var(--card)" stroke-width="1.8"><title>B 强化 · L1 基础题：66.7%</title></circle>
+<text x="63.0" y="164.0" font-size="10.5" font-weight="600" fill="#16a34a" style="paint-order:stroke;stroke:var(--card);stroke-width:3px">67%</text>
+<circle cx="359.0" cy="167.4" r="4.6" fill="#16a34a" stroke="var(--card)" stroke-width="1.8"><title>B 强化 · L2 老师不会：56.2%</title></circle>
+<text x="368.0" y="157.4" font-size="10.5" font-weight="600" fill="#16a34a" style="paint-order:stroke;stroke:var(--card);stroke-width:3px">56%</text>
+<circle cx="664.0" cy="267.2" r="4.6" fill="#16a34a" stroke="var(--card)" stroke-width="1.8"><title>B 强化 · L3 都不会：20.8%</title></circle>
+<text x="673.0" y="280.2" font-size="10.5" font-weight="600" fill="#16a34a" style="paint-order:stroke;stroke:var(--card);stroke-width:3px">21%</text>
+<circle cx="54.0" cy="128.6" r="4.6" fill="#d97706" stroke="var(--card)" stroke-width="1.8"><title>C 混合 · L1 基础题：70.0%</title></circle>
+<text x="63.0" y="141.6" font-size="10.5" font-weight="600" fill="#d97706" style="paint-order:stroke;stroke:var(--card);stroke-width:3px">70%</text>
+<circle cx="359.0" cy="173.2" r="4.6" fill="#d97706" stroke="var(--card)" stroke-width="1.8"><title>C 混合 · L2 老师不会：54.2%</title></circle>
+<text x="368.0" y="186.2" font-size="10.5" font-weight="600" fill="#d97706" style="paint-order:stroke;stroke:var(--card);stroke-width:3px">54%</text>
+<circle cx="664.0" cy="255.5" r="4.6" fill="#d97706" stroke="var(--card)" stroke-width="1.8"><title>C 混合 · L3 都不会：25.0%</title></circle>
+<text x="673.0" y="245.5" font-size="10.5" font-weight="600" fill="#d97706" style="paint-order:stroke;stroke:var(--card);stroke-width:3px">25%</text>
+<circle cx="54.0" cy="123.9" r="4.6" fill="#dc2626" stroke="var(--card)" stroke-width="1.8"><title>老师 · L1 基础题：71.7%</title></circle>
+<text x="63.0" y="113.9" font-size="10.5" font-weight="600" fill="#dc2626" style="paint-order:stroke;stroke:var(--card);stroke-width:3px">72%</text>
+<circle cx="359.0" cy="326.0" r="4.6" fill="#dc2626" stroke="var(--card)" stroke-width="1.8"><title>老师 · L2 老师不会：0.0%</title></circle>
+<text x="368.0" y="316.0" font-size="10.5" font-weight="600" fill="#dc2626" style="paint-order:stroke;stroke:var(--card);stroke-width:3px">0%</text>
+<circle cx="664.0" cy="326.0" r="4.6" fill="#dc2626" stroke="var(--card)" stroke-width="1.8"><title>老师 · L3 都不会：0.0%</title></circle>
+<text x="673.0" y="339.0" font-size="10.5" font-weight="600" fill="#dc2626" style="paint-order:stroke;stroke:var(--card);stroke-width:3px">0%</text>
+<circle cx="54.0" cy="44.0" r="4.6" fill="#2563eb" stroke="var(--card)" stroke-width="1.8"><title>云端 · L1 基础题：100.0%</title></circle>
+<text x="63.0" y="34.0" font-size="10.5" font-weight="600" fill="#2563eb" style="paint-order:stroke;stroke:var(--card);stroke-width:3px">100%</text>
+<circle cx="359.0" cy="49.9" r="4.6" fill="#2563eb" stroke="var(--card)" stroke-width="1.8"><title>云端 · L2 老师不会：97.9%</title></circle>
+<text x="368.0" y="39.9" font-size="10.5" font-weight="600" fill="#2563eb" style="paint-order:stroke;stroke:var(--card);stroke-width:3px">98%</text>
+<circle cx="664.0" cy="79.2" r="4.6" fill="#2563eb" stroke="var(--card)" stroke-width="1.8"><title>云端 · L3 都不会：87.5%</title></circle>
+<text x="673.0" y="69.2" font-size="10.5" font-weight="600" fill="#2563eb" style="paint-order:stroke;stroke:var(--card);stroke-width:3px">88%</text>
+<line x1="678" y1="56" x2="702" y2="56" stroke="#94a3b8" stroke-width="3" stroke-linecap="round"/>
+<text x="708" y="60" font-size="12" fill="var(--text)">原版</text>
+<line x1="678" y1="80" x2="702" y2="80" stroke="#7c3aed" stroke-width="3" stroke-linecap="round"/>
+<text x="708" y="84" font-size="12" fill="var(--text)">A1 蒸馏</text>
+<line x1="678" y1="104" x2="702" y2="104" stroke="#16a34a" stroke-width="3" stroke-linecap="round"/>
+<text x="708" y="108" font-size="12" fill="var(--text)">B 强化</text>
+<line x1="678" y1="128" x2="702" y2="128" stroke="#d97706" stroke-width="3" stroke-linecap="round"/>
+<text x="708" y="132" font-size="12" fill="var(--text)">C 混合</text>
+<line x1="678" y1="152" x2="702" y2="152" stroke="#dc2626" stroke-width="3" stroke-linecap="round"/>
+<text x="708" y="156" font-size="12" fill="var(--text)">老师</text>
+<line x1="678" y1="176" x2="702" y2="176" stroke="#2563eb" stroke-width="3" stroke-linecap="round"/>
+<text x="708" y="180" font-size="12" fill="var(--text)">云端</text>
+</svg>
+<!-- CHART:END layer-trend -->
+
+  <p>
+    <b>怎么读这张图</b>：横轴向右是题目变难。
+    健康的模型应该是"缓慢下降"；而 <b>A1 那条线在中间断崖式跳水</b>（53% → 17%），
+    说明它只学得会老师教过的东西，一旦老师也不会，它就彻底失灵 ——
+    而且还被老师的错误思路带偏了。
+    相比之下 B、C 两条线下降得平缓得多。
+  </p>
+
+  <h3>3.4 还有一个惊喜：L3 上从 0 到 25%</h3>
+
+  <p>
+    在"大学生和原版小学生<b>都不会</b>"的最难那一层：
+    原版小学生是 <b>0%</b>，自己刷题的两个却做到了 <b>20.8% 和 25.0%</b>。
+  </p>
+
+  <p>
+    这说明它们<b>不是靠模仿</b> —— 这些题没人做对过，模仿也没得模仿。
+    它们是<b>自己琢磨出了原版完全不具备的解题能力</b>。
+  </p>
+
+  <div class="verdict">
+    <h3>四句话总结</h3>
+    <ul>
+      <li><b>抄作业在"老师会的题"上有用</b>：53.3% 比不学的 48.3% 高，但只高一点。</li>
+      <li><b>抄作业在"老师不会的题"上有害</b>：从 39.6% 掉到 16.7% —— 连老师错的地方一起抄了。</li>
+      <li><b>自己刷题才是真本事</b>：老师不会的题上做到 56.2%，几乎是"不学"的 1.5 倍。</li>
+      <li><b>而且它是"学出来的"，不是"抄出来的"</b>：在最难那一层从 0% 做到了 20%+。</li>
+    </ul>
+  </div>
+
+  <h3>3.5 这些差距是真的吗？—— 统计检验</h3>
+
+  <p>
+    数字有高低，会不会只是运气？用<b>配对检验</b>（同一道题上谁对谁错，一一对照）算了一下：
+  </p>
+
+  <table>
+    <thead>
+      <tr><th>对比</th><th class="num">p 值</th><th>结论</th></tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><b>抄作业 vs 自己刷题</b>（A1 vs B）</td>
+        <td class="num"><b>0.0018</b></td>
+        <td class="win">显著 —— 自己刷题明显更好</td>
+      </tr>
+      <tr>
+        <td><b>自己刷题 vs 老师</b>（B vs teacher）</td>
+        <td class="num"><b>0.0309</b></td>
+        <td class="win">显著 —— <b>学生越过了老师</b></td>
+      </tr>
+      <tr>
+        <td><b>先抄后刷 vs 老师</b>（C vs teacher）</td>
+        <td class="num"><b>0.0309</b></td>
+        <td class="win">显著 —— <b>学生越过了老师</b></td>
+      </tr>
+      <tr>
+        <td>抄作业 vs 老师（A1 vs teacher）</td>
+        <td class="num dim">0.7266</td>
+        <td class="dim">不显著 —— 抄作业没有越过老师</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <p class="muted" style="font-size:14px">
+    一般把 p 值小于 0.05 视为"不太可能是运气"。上面前三行都通过了，
+    最后一行没有 —— 这正是我们要找的那个分界。
+  </p>
+
+  <div class="warn">
+    <p>
+      <b>诚实起见，两点必须说明：</b><br>
+      ① 这一层的题目只有 <b>16 道</b>，样本偏少。方向非常清楚、统计检验也达到了"显著"，
+      但如果要更强的证据，需要把题库扩大 2–3 倍重做一遍。<br>
+      ② 云端顶级模型（DeepSeek V4 Pro）在这一层是 <b>97.9%</b>。
+      所以小模型虽然越过了自己的老师，<b>离真正的强模型还差得非常远</b>。
+    </p>
+  </div>
+
+  <h2>四、整个计划是怎么走的</h2>
+
+  <p class="muted">从动手到出结论，一共约 40 小时机器时间，分成两大轮。</p>
+
+  <div class="tl">
+    <div class="tl-item done">
+      <b>第一步 · 出题与筛选</b>
+      <span>程序自动生成数学题 → 让大学生和原版小学生各做 5 遍 → 按"谁会谁不会"分成 L1/L2/L3 三层（约 7 小时，最耗时的一步）</span>
+    </div>
+    <div class="tl-item done">
+      <b>第二步 · 锁定考卷</b>
+      <span>把 52 道题冻结成"考卷"，此后任何训练都不许碰它 —— 保证考试公平</span>
+    </div>
+    <div class="tl-item done">
+      <b>第三步 · 训练 A1（抄大学生）</b>
+      <span>1 小时 27 分</span>
+    </div>
+    <div class="tl-item done">
+      <b>第四步 · 训练 B（自己刷题）</b>
+      <span>3 小时 50 分 —— 最慢的一步，因为每道题要现场做 8 遍再总结</span>
+    </div>
+    <div class="tl-item done">
+      <b>第五步 · 训练 C（先抄后刷）</b>
+      <span>2 小时 30 分</span>
+    </div>
+    <div class="tl-item done">
+      <b>第六步 · 统一考试</b>
+      <span>6 个角色 × 52 道题 × 每道 3 遍 = 936 次作答，共约 3.5 小时</span>
+    </div>
+    <div class="tl-item done">
+      <b>第七步 · 出报告</b>
+      <span>自动汇总成图表与结论</span>
+    </div>
+  </div>
+
+  <p>
+    中间出过一次事故 —— 第一次考试时，因为一个程序上的疏忽，
+    <b>考卷里只混进了基础题（L1），最难的那两层一道都没考</b>。
+    于是又补考了一次（约 1 小时 11 分），才有了上面这份完整结果。
+  </p>
+
+  <h2>五、文件都在哪</h2>
+
+  <p>
+    项目放在 <span class="kbd">桌面 → AI → Local-Model-Lab</span>。
+    分门别类，看一眼就明白：
+  </p>
+
+<pre class="tree">
+<b>Local-Model-Lab/</b>
+│
+├── <b>base/</b>                  <i>小学生原版（4.3 GB，只读，永不修改）</i>
+│
+├── <b>branch-A-distill/</b>      <i>走"抄作业"这条路的全部东西</i>
+│   └── adapter-A1/           <i>★ 训练成果：A1 的"补丁"（67 MB）</i>
+│
+├── <b>branch-B-rl/</b>           <i>走"自己刷题"这条路的全部东西</i>
+│   ├── adapter-B/            <i>★ 训练成果：B 的"补丁"（67 MB）</i>
+│   ├── adapter-C/            <i>★ 训练成果：C 的"补丁"（67 MB）</i>
+│   └── data/                 <i>刷题用的题库</i>
+│
+├── <b>shared/</b>                <i>两条路共用的东西</i>
+│   ├── results/
+│   │   ├── 横评报告.html      <i>★ 完整评测报告（浏览器打开）</i>
+│   │   ├── 横评报告.md
+│   │   ├── eval_metrics.json  <i>各项指标汇总</i>
+│   │   └── eval_raw.jsonl     <i>1014 条原始答题记录</i>
+│   └── bench_stratified.jsonl <i>★ 冻结的考卷（52 题）</i>
+│
+├── <b>scripts/</b>               <i>所有程序</i>
+│   ├── progress.sh           <i>★ 看进度（最常用）</i>
+│   ├── labctl.sh             <i>★ 暂停 / 恢复</i>
+│   ├── 09~12 · 出题与筛选
+│   ├── 11 · 训练 A1（蒸馏）
+│   ├── 20 · 训练 B/C（强化学习）
+│   ├── 30 · 评测
+│   └── 31 · 生成报告
+│
+├── <b>docs/</b>                  <i>笔记</i>
+│   ├── 原理笔记.md            <i>技术原理</i>
+│   ├── 踩坑记录.md            <i>24 个踩过的坑</i>
+│   └── 经验教训总纲.md        <i>★ 提炼出的通用经验</i>
+│
+├── <b>configs/</b>               <i>所有参数设置（改这里就能改实验）</i>
+├── <b>logs/</b>                  <i>运行日志</i>
+├── <b>backup/</b>                <i>备份</i>
+│
+├── <b>README.md</b>              <i>给技术读者的说明书</i>
+├── <b>完整计划.md</b>            <i>最初的完整计划</i>
+├── <b>成果展示.md</b>            <i>第一轮的成果</i>
+└── <b>项目全貌.html / .md</b>    <i>★ 就是你正在看的这份</i>
+</pre>
+
+  <p>
+    桌面上另建了一个成果快捷方式文件夹
+    <span class="kbd">本地模型实验室-成果</span>，
+    里面是训练好的模型和报告的快捷方式 —— 双击即达，不用层层点进去找。
+  </p>
+
+  <div class="warn">
+    <p>
+      <b>关于那三个"补丁"文件：</b>它们每个只有 67 MB，
+      是在原版模型基础上加的一层小改动（技术上叫 <b>LoRA</b>），
+      <b>不是完整模型</b>。要用它们，必须配合 <span class="kbd">base/</span> 里的原版模型。
+      直接双击文件夹只会看到几个 <span class="kbd">.safetensors</span> 文件，属正常现象。
+    </p>
+  </div>
+
+  <h2>六、几个名词，一句话解释</h2>
+
+  <div class="gloss">
+    <div class="gloss-item">
+      <b>蒸馏</b>
+      <span>让小模型模仿大模型的输出。相当于"抄解题过程"。学的是<b>像不像</b>。</span>
+    </div>
+    <div class="gloss-item">
+      <b>强化学习</b>
+      <span>让模型自己尝试、按结果好坏调整。相当于"自己做题对答案"。学的是<b>对不对</b>。</span>
+    </div>
+    <div class="gloss-item">
+      <b>LoRA（补丁）</b>
+      <span>不动原模型，只在旁边加一层很小的可调参数。省内存，也方便随时换。</span>
+    </div>
+    <div class="gloss-item">
+      <b>teacher / student</b>
+      <span>老师模型 / 学生模型。这里老师是 9B，学生是 2B（参数越多通常越聪明）。</span>
+    </div>
+    <div class="gloss-item">
+      <b>一致性</b>
+      <span>回答风格跟老师有多像。<b>抄作业的人一致性特别高</b>（61%），但会做不一定等于会做对。</span>
+    </div>
+    <div class="gloss-item">
+      <b>多样性</b>
+      <span>同一道题每次都答得一样、还是有不同思路。太低说明在死记硬背。</span>
+    </div>
+  </div>
+
+  <footer>
+    <p>
+      项目位置：<span class="kbd">~/Desktop/AI/Local-Model-Lab</span> ｜
+      评测规模：6 个角色 × 52 题 × 3 次采样 = 936 次作答（另有探针 78 次）
+    </p>
+    <p>
+      全部在一台 2018 款 Intel MacBook Pro（i7-8850H / 16GB / 无独立显卡）上纯 CPU 完成。
+      云基线走网络、不占本机内存。
+    </p>
+  </footer>
+
+</div>
+</body>
+</html>

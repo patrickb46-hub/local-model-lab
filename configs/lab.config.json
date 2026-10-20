@@ -1,0 +1,260 @@
+{
+  "$comment": "本地模型实验室 · 全局配置。此文件是唯一事实来源，改这里一处，全局生效。",
+  "version": "1.0.0",
+  "created": "2026-10-04",
+
+  "paths": {
+    "$lab_root_comment": "相对路径 \".\" 表示「以本项目根目录为根」。scripts/common.py 的 lab_path() 遇到非绝对路径会自动以仓库根为基准，所以克隆到任何机器都能直接跑，无需改这一行。",
+    "lab_root": ".",
+    "base": "base",
+    "branch_a": "branch-A-distill",
+    "branch_b": "branch-B-rl",
+    "shared": "shared",
+    "results": "shared/results",
+    "logs": "logs"
+  },
+
+  "runtime": {
+    "$comment": "两条解释器路径的由来见 docs/踩坑记录.md。核心矛盾：Intel Mac 的 PyPI torch 停在 2.2.2，而 Qwen3.5 需要 transformers 5.x（要求 torch>=2.5）。唯一出路是从 conda-forge 拿 osx-64 的新 torch。mlab 是备用的纯 PyPI 环境（torch 2.2.2，仅够跑不需要模型的脚本）。",
+    "$python_comment": "下列解释器路径是「本机参考值」，用 ~ 表示家目录（common.py 的 resolve_python() 会做 expanduser）。换机器请改成你自己的环境路径；找不到时自动退到 python_system，再退到当前解释器，不会硬崩。",
+    "python": "~/.workbuddy/binaries/python/envs/mlab-conda/bin/python",
+    "python_fallback": "~/.workbuddy/binaries/python/envs/mlab/bin/python",
+    "python_system": "/usr/bin/python3",
+    "micromamba": "~/.workbuddy/binaries/micromamba/bin/micromamba",
+    "conda_channel": "conda-forge",
+    "pip_index": "https://mirrors.aliyun.com/pypi/simple/",
+    "hf_endpoint": "https://hf-mirror.com",
+    "torch_threads": 10,
+    "env": {
+      "HF_HUB_DISABLE_XET": "1",
+      "TOKENIZERS_PARALLELISM": "false",
+      "PYTHONUNBUFFERED": "1"
+    }
+  },
+
+  "base_model": {
+    "$comment": "当前启用的底座。Qwen3.5 是原生多模态 + 混合注意力（每 4 层 1 个 full attention，其余线性注意力），故 text_only=true 只加载语言主干。切尺寸：把 base_size/repo_id/local_dir 换成 variants 里对应的一组即可。",
+    "repo_id": "Qwen/Qwen3.5-2B",
+    "local_dir": "base",
+    "base_size": "2B",
+    "variants": {
+      "$comment": "同家族两个尺寸。4B=4.38B 参数，fp32 权重 17.5GB > 16GB 物理内存 —— 要训 4B 必须走 4-bit 量化（HQQ）。",
+      "2B": {"repo_id": "Qwen/Qwen3.5-2B", "local_dir": "base", "params_b": 2.21},
+      "4B": {"repo_id": "Qwen/Qwen3.5-4B", "local_dir": "base-4b", "params_b": 4.38}
+    },
+    "text_only": true,
+    "dtype": "float32",
+    "$dtype_comment": "训练必须用 float32！实测（本机 get_cpu_capability()=AVX2，无 BF16 原生指令）：bf16 前向 4.6s 但反向 >420s（病态，慢约 200 倍）；fp32 前向 12.6s + 反向 2.2s。只看前向会得出相反的错误结论。",
+    "inference_dtype": "float32",
+    "$inference_dtype_comment": "推理也用 float32。实测（AVX2 CPU，bf16 全靠模拟）：生成速度 bf16 0.70 tok/s vs fp32 1.32 tok/s —— fp32 快近一倍。所以全流程统一 fp32，不做精度分工。",
+    "trust_remote_code": false
+  },
+
+  "teacher": {
+    "$comment": "Ollama 里的 9B 只动嘴（生成数据/当评判），绝不训练它。Qwen3.5 默认开思考模式，直连 API 必须显式 think=false。",
+    "provider": "ollama",
+    "ollama_url": "http://127.0.0.1:11434",
+    "model": "qwen3.5:9b",
+    "fallback_model": "qwen3.5:4b",
+    "think": false,
+    "options": {
+      "temperature": 0.7,
+      "top_p": 0.9,
+      "num_predict": 640,
+      "num_ctx": 4096
+    },
+    "request_timeout": 600,
+    "retry": 3
+  },
+
+  "task": {
+    "$comment": "统一任务轴：初中数学小题 + 固定结构化输出格式。两条支线共享同一格式规范，因此可比。",
+    "axis": "math",
+    "name": "初中数学小题 · 结构化分步解答",
+    "level": "八年级（沪教版）",
+    "system_prompt": "你是一位耐心的初中数学老师。请解答用户给出的数学小题。\n必须严格按以下固定格式作答，不要添加任何额外内容：\n【思路】用一句话点明解题方向。\n【步骤】\n1. 第一步……\n2. 第二步……\n【答案】只写最终答案。\n字数要求：全文不超过 150 字；【思路】不超过一句话；每个步骤不超过一句话；【答案】只写结果本身，不带解释。",
+    "output_format": {
+      "sections": ["【思路】", "【步骤】", "【答案】"],
+      "answer_max_chars": 64,
+      "min_steps": 1,
+      "max_steps": 8
+    },
+    "categories": [
+      "整式运算",
+      "因式分解",
+      "一元一次方程",
+      "二元一次方程组",
+      "一元一次不等式",
+      "分式运算",
+      "二次根式",
+      "一次函数",
+      "几何度量",
+      "比例百分数"
+    ]
+  },
+
+  "data": {
+    "$comment": "题库由程序化出题器生成（答案天然精确、可验证）。eval 在训练前锁定，永不进训练数据。质量优先：蒸馏题量按 1.5 倍冗余生成（实测 teacher 有约 20% 会被验证筛掉）。",
+    "seed": 20261004,
+    "eval_size": 52,
+    "eval_limit": 0,
+    "$eval_limit_comment": "【2026-10-10 修正】0 = 跑满分层基准全部 52 题（L1 20 / L2 16 / L3 16）。原值 20 配合旧代码的 eval_set[:limit] 恰好只截到 20 道 L1（基准文件按层分块写出，L1 在最前），评测集里一道 L2/L3 都没有 —— 核心命题「L2 上 RL 臂能否越过 teacher」直接无法回答。旧代码已改为分层轮转取样，此处设为 0 用全量。若将来要限量，--limit 也会按层轮转、不再切出单一层。",
+    "distill_prompts": 150,
+    "rl_prompts": 120,
+    "eval_file": "shared/eval_set.jsonl",
+    "candidate_pool_size": 300,
+    "$candidate_pool_size_comment": "候选池题量。**先别一次到位**：实测成本 = 池 N × K 5 × 2 侧 ≈ N × 0.09 小时（base 约 150 token/次 @5 tok/s，teacher 33s/次）。N=800 要 70 小时，不可接受。正确做法是先用 --limit 40 跑**试点**测出 L2 命中率，再按 N ≈ 目标L2数 / 命中率 定规模。N=300 是命中率 ≥20% 时的默认值（约 26 小时，可跨两夜）。",
+    "candidate_pool_file": "shared/candidate_pool.jsonl",
+    "hard_ratio": 0.75,
+    "$hard_ratio_comment": "候选池里高难题族（链式运算/分数四则/方程组组合式/多步方程/一次函数平移）的占比。这些题多步、需要中间推理，量化 9B teacher 在长链上系统性掉分，而 2B base 因采样发散偶发能命中 —— 正是 L2 的高产区。注意这只作用于**候选池的出题分布**，分层仍靠测量判定、与训练方法无关。",
+    "bench_file": "shared/bench_stratified.jsonl",
+    "$bench_file_comment": "分层基准（L1/L2/L3），由 12_screen_layers.py 生成并在训练前冻结。"
+  },
+
+  "distill": {
+    "$comment": "支线 A（A2 领域知识 + A3 输出格式）：teacher 生成 → 清洗 → LoRA SFT。序列级蒸馏，不做 logit 级。",
+    "branch": "branch-A-distill",
+    "raw_file": "branch-A-distill/data/raw_teacher.jsonl",
+    "train_file": "branch-A-distill/data/train.jsonl",
+    "test_file": "branch-A-distill/data/test.jsonl",
+    "train_ratio": 0.9,
+    "min_answer_ratio": 0.85,
+    "filter_correct": true,
+    "$filter_correct_comment": "验证筛选（rejection sampling）：用判分器剔除 teacher 答错的样本。实测官方 qwen3.5:9b 在算术题上错误率约 20%，不过滤学生就在学错的解法。公平性：支线 B 的奖励用的是同一个验证器，两条线都吃「题目可验证」这个前提。",
+    "lora": {
+      "r": 16,
+      "alpha": 32,
+      "dropout": 0.05,
+      "target_modules": "auto",
+      "bias": "none"
+    },
+    "training": {
+      "max_seq_length": 288,
+      "$max_seq_comment": "实测 fp32 下 seq≈85 单步 24.5s、峰值 10.89 GB。288 是「能放下完整 teacher 回答」与「不撑爆内存」的折中；配合 system_prompt 里的字数约束控制长度。",
+      "max_steps": 40,
+      "$max_steps_comment": "【受控变量】两条支线对齐到相同优化步数 40（原 60；本轮因 24h 预算下调，三臂仍按同一步数对齐，受控关系不变）。注意：SFT 一步 24.5s（60 步≈25 分钟≈6 轮遍历），而 GRPO 一步约 7.5 分钟（要跑 4 次完整生成 + 策略梯度），60 步≈7.5 小时。按墙钟对齐会变成比预算而非比方法。SFT 时间短不等于训练不够——60 步×8 样本累计 480 次样本梯度，对小数据集是约 6 轮。",
+      "per_device_batch_size": 1,
+      "gradient_accumulation": 8,
+      "learning_rate": 0.0001,
+      "num_epochs": 5,
+      "$epochs_comment": "必须够大，否则 max_steps=60 够不到：110 条训练样本 ÷ grad_accum 8 = 14 步/轮，2 轮只有 28 步（实测踩过），5 轮 = 70 步 → 被 max_steps 截到 60。受控变量才能真正对齐。",
+      "warmup_ratio": 0.03,
+      "weight_decay": 0.0,
+      "max_grad_norm": 1.0,
+      "gradient_checkpointing": true,
+      "$ckpt_comment": "【实测后改为 true】关闭时峰值 12.28 GB，把 16 GB 的机器逼到 swap 用了 4.1/5.1 GB，疯狂换页导致单步从 147s 拖到十几分钟。开启后用重算换内存，消除换页 —— 单步略慢但总时长反而更短。这不只是优化，是跑得起来的前提。",
+      "logging_steps": 1,
+      "save_steps": 5,
+      "seed": 20261004
+    }
+  },
+
+  "rl": {
+    "$comment": "支线 B / C。奖励全可验证（答案对/格式合规/步骤齐全），无需奖励模型。注意：本实现是「组基线策略梯度 + KL」，不是教科书 GRPO —— 单次更新下重要性比恒为 1、clip 不激活，详见 20_train_rl.py 文件头的诚实声明。",
+    "branch": "branch-B-rl",
+    "prompt_file": "branch-B-rl/data/prompts.jsonl",
+    "train_pool": "branch-B-rl/data/rl_pool_curated.jsonl",
+    "$train_pool_comment": "难度筛选（C2）：分级筛查产出的 curated 池，只含「模型有时能做对」的题。旧版从全池有放回抽题，导致 61 步里 29 步组内奖励全同、优势恒为 0 —— 那些步只剩 KL 项，等于主动把策略往 base 拉回，是负贡献。文件不存在时自动回退到 prompt_file 并告警。",
+    "reward_weights": {
+      "correct": 1.0,
+      "format": 0.05,
+      "steps": 0.05,
+      "overlong_penalty": -0.1
+    },
+    "$reward_weights_comment": "重配（C11）：旧版 format 0.5 + steps 0.2 而两者实测恒为 1.0（起点即饱和），在组内归一化下本就是常数、被完全消去，却平白放大了奖励的整体尺度。现在只留极小权重防劣化，把区分度集中到 correct 上。",
+    "grpo": {
+      "$comment": "max_steps 与支线 A 对齐为 60（受控变量：等优化器更新次数）。max_new_tokens 必须够写完整三段——太短会让所有 rollout 都残缺、奖励没有区分度。",
+      "num_generations": 8,
+      "$num_generations_comment": "4 → 8。组内全同的概率从 2×(1/2)^4≈12.5% 降到 ≈0.8%，直接消掉大量零优势空步。批量生成让这个提升几乎不增加墙钟（实测 B=8 仍比串行 4 次快）。",
+      "prompts_per_step": 1,
+      "$prompts_per_step_comment": "【实测后从 2 改回 1】原本想用 2 题/步来加倍数据，但分阶段实测显示：每步生成量直接决定墙钟，pps=2 会把 60 步推到 ~11 小时。而**决定优势估计质量的是组内样本数 ng，不是每步几道题** —— 保住 ng=8（同质组概率 0.8%）比 pps=2 更划算。改回 1 后 60 步 ≈ 480 次 rollout ≈ 5~6 小时。",
+      "max_steps": 40,
+      "max_new_tokens": 192,
+      "$max_new_tokens_comment": "128 → 192，与评测口径对齐（C5）。旧版训练用 128、评测用 192，等于训练时逼模型学短回答、评测时又放开，属于口径不一致。",
+      "temperature": 0.9,
+      "top_p": 0.95,
+      "kl_coef": 0.02,
+      "kl_clip": 10.0,
+      "$kl_clip_comment": "C7：k3 估计量里的 exp(d) 在 d 很大时会爆，把 d 裁到 ±10。",
+      "batch_generate": true,
+      "$batch_generate_comment": "C1：用 generate_reply_batch 一次产 G 条。纯 CPU 解码是内存带宽受限的，批量可复用同一次权重读取。实测 B=1→1.28、B=4→3.05、B=8→4.19 tok/s。",
+      "gen_batch_size": 4,
+      "$gen_batch_size_comment": "把 ng 条采样拆成每批最多这么多条，分批调用 generate_reply_batch。为什么需要：实测 16GB 机器上 B=8 + fp32 会把 swap 打满（4626/5120 MB）导致疯狂换页、单步反而更慢。B=4 的吞吐是 3.05 tok/s（B=8 是 4.19），但内存峰值只有一半 —— 峰值换整体速度。设 0 表示不分块。",
+      "inner_epoch": 1,
+      "$inner_epoch_comment": "【等步数·路线甲】固定为 1：一个 rollout 批次只做一次参数更新。若设为 >1 则同一批 rollout 复用多次，参数更新次数翻倍、破坏 A1 vs B 的 60:60 对照 —— 而那正是本实验唯一要隔离的变量（验证器 vs 模仿）。代价是重要性比恒为 1、clip 永不激活，所以本实现如实叫「组基线策略梯度」而非 GRPO。",
+      "learning_rate": 5e-05,
+      "gradient_accumulation": 1,
+      "gradient_checkpointing": true,
+      "$ckpt_comment": "同支线 A：实测内存紧张会引发换页，开检查点换内存更划算。",
+      "seed": 20261004
+    },
+    "lora": {
+      "r": 16,
+      "alpha": 32,
+      "dropout": 0.05,
+      "target_modules": "auto",
+      "bias": "none"
+    }
+  },
+
+  "layers": {
+    "$comment": "分层筛查（12_screen_layers.py 用）。定义见脚本文件头：L1 = teacher 会做；L2 = teacher 系统性失败但 base 有机会；L3 = 谁都做不到。",
+    "base_pass_k": 5,
+    "$base_pass_k_comment": "base 侧每题采样次数。取大是为了检出「稀有成功」—— 一道题若 base 的真实成功率只有 10%，K=3 时漏检率高达 73%，K=5 降到 59%，K=8 降到 43%。L2 的判定完全依赖这个数，宁大勿小。",
+    "teacher_pass_k": 5,
+    "$teacher_pass_k_comment": "teacher 侧每题采样次数。**必须够大**：若 teacher 只是采样噪声（如 1/3 对），filter_correct 会保留它答对的那次，蒸馏就不被结构性封堵，整个论证会塌。K=5 把「真失败」误判成「会做」的概率压到可接受。",
+    "min_l2": 24,
+    "$min_l2_comment": "【硬闸门】L2 题数不足此值就**中止重训**，先回 P1 调题族。为什么是 24：按 McNemar 配对检验，若 L2 上蒸馏 30%、RL 80%，N=24 时期望不一致对约 13.4 : 1.4，χ²≈8.5（p<0.01），足够显著。低于 24 则只能看趋势、不能下结论。",
+    "bench_l1": 20,
+    "bench_l2": 40,
+    "bench_l3": 16,
+    "$bench_comment": "各层放进基准的题数。L2 取 40（超过闸门 24，留冗余）；L1 取 20 用来验证「蒸馏在 teacher 主场不退化」；L3 取 16 作为天花板证据。",
+    "pool_l1": 60,
+    "$pool_l1_comment": "RL 训练池里额外加入多少道「base 可解的 L1」题。纯 L2 池的奖励方差可能偏低，掺入一部分 base 能做对但常做错的 L1，可提高组内优势的区分度，训练更稳。"
+  },
+
+  "eval": {
+    "$comment": "六模型横评，分三类来源。① 本地：base/A/B —— 同一份 2B 权重 + 不同 LoRA（多适配器切换，省内存）；② Ollama：qwen4b/teacher —— 本机量化原版；③ 云 API：dsv4pro —— 不占本机内存的强模型基线。核心问题：微调后的 2B 能不能追上原版 4B。",
+    "models": ["base", "A1", "A2", "B", "C", "dsv4pro", "teacher"],
+    "local_adapters": {
+      "$comment": "本地角色 → adapter 目录（相对 lab 根）。base 不挂 adapter。四个臂：A1（蒸馏60步）/ A2（蒸馏120步，从A1续）/ B（RL60步，从base起）/ C（RL60步，从A1预热起）。旧的 A 保留做兼容。",
+      "A1": "branch-A-distill/adapter-A1",
+      "A2": "branch-A-distill/adapter-A2",
+      "B": "branch-B-rl/adapter-B",
+      "C": "branch-B-rl/adapter-C",
+      "A": "branch-A-distill/adapter"
+    },
+    "ollama_baselines": {
+      "$comment": "角色名 → Ollama 模型名。本机部署的官方原版（量化），用来回答「微调 vs 原版」「2B 能不能顶上 4B」。原 qwen2b（qwen3.5:2b）已移出横评：它和 base 是同一个模型的两种精度，差异只反映量化损失、不反映能力，留在表里反而干扰读表。",
+      "qwen4b": "qwen3.5:4b",
+      "teacher": "qwen3.5:9b"
+    },
+    "cloud_baselines": {
+      "$comment": "云服务基线，走 HTTP API、不占本机内存。作用：给「微调后的小模型」一个外部强参照 —— 前 6 个角色里有 5 个都是 Qwen 系、3 个是量化版，仅靠它们无法回答「离真正的强模型还差多远」。",
+      "dsv4pro": {
+        "label": "DeepSeek V4 Pro（云 API）",
+        "base_url": "https://api.deepseek.com/anthropic",
+        "$base_url_comment": "Anthropic 兼容端点，实际请求路径 /v1/messages。凭据不写进本文件，只写环境变量名。",
+        "model": "deepseek-v4-pro",
+        "api_key_env": "COPILOT_PROVIDER_API_KEY",
+        "max_tokens": 1024,
+        "$max_tokens_comment": "【为什么不受 max_new_tokens=192 约束】192 这个上限是为「本机纯 CPU 生成」定的（一条要 40-90 秒，必须卡住）。云 API 一条只要几秒，把本机的硬件限制套到云基线头上会造成「被截断的假性低分」—— 尤其是推理模型，思考一旦挤掉正文，【答案】就没了。故云角色用自己的预算。本地角色仍是 192。",
+        "timeout": 300,
+        "retry": 3
+      }
+    },
+    "temperature_greedy": 0.0,
+    "repeats": 3,
+    "$repeats_comment": "每题重复采样次数。注意：greedy(T=0) 是确定性的，重复跑结果完全一样、取平均无意义；所以主测改用温度采样 + 多次重复，报告「均值±标准差」。同一批样本同时用于算正确率均值和输出多样性，不必跑两遍。",
+    "sample_temperature": 0.7,
+    "think_modes": ["off", "on"],
+    "$think_comment": "thinking 开关两种都测。机制不同：本地 HF 版走 chat template 的 enable_thinking；Ollama 版走 API 的 think 参数。注意解析时必须先剥掉 <think>…</think>，否则推理块里的【答案】会被误判成正式答案。",
+    "think_probe_size": 3,
+    "$think_probe_comment": "think=on 的对照口径。实测开思考后输出会长好几倍（本地 1.32 tok/s 下单条可能 5 分钟），所以对照只用小探针。本版进一步从 6 题削到 3 题：6×1 次的样本量本就不足以支撑结论、只能看趋势，省下的算力改投主测的题目数（eval_limit 12→20）—— 那才是回答核心问题的数据。",
+    "think_probe_repeats": 1,
+    "think_max_new_tokens": 384,
+    "max_new_tokens": 192,
+    "general_probe_file": "shared/general_probe.jsonl",
+    "seed": 1234
+  }
+}

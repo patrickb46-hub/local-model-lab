@@ -1,0 +1,777 @@
+{
+  "tag": "B",
+  "started_from": "base（从零）",
+  "steps": 40,
+  "n_effective": 30,
+  "n_dead": 10,
+  "pool": "branch-B-rl/data/rl_pool_curated.jsonl",
+  "history": [
+    {
+      "step": 1,
+      "prompt_ids": [
+        "p0077"
+      ],
+      "mean_reward": 0.475,
+      "std_reward": 0.4841,
+      "accuracy": 0.375,
+      "format_rate": 1.0,
+      "n_correct": 3,
+      "n_samples": 8,
+      "diversity": 0.312,
+      "loss": -0.0194,
+      "effective": true,
+      "tokens": 2278,
+      "peak_mem_gb": 11.72,
+      "step_s": 438.6,
+      "elapsed_s": 438.6
+    },
+    {
+      "step": 2,
+      "prompt_ids": [
+        "p0009"
+      ],
+      "mean_reward": 1.1,
+      "std_reward": 0.0,
+      "accuracy": 1.0,
+      "format_rate": 1.0,
+      "n_correct": 8,
+      "n_samples": 8,
+      "diversity": 0.434,
+      "loss": null,
+      "effective": false,
+      "tokens": 0,
+      "peak_mem_gb": 11.72,
+      "step_s": 131.7,
+      "elapsed_s": 570.3
+    },
+    {
+      "step": 3,
+      "prompt_ids": [
+        "p0017"
+      ],
+      "mean_reward": 0.85,
+      "std_reward": 0.433,
+      "accuracy": 0.75,
+      "format_rate": 1.0,
+      "n_correct": 6,
+      "n_samples": 8,
+      "diversity": 0.543,
+      "loss": 0.0166,
+      "effective": true,
+      "tokens": 1627,
+      "peak_mem_gb": 11.72,
+      "step_s": 267.8,
+      "elapsed_s": 838.1
+    },
+    {
+      "step": 4,
+      "prompt_ids": [
+        "p0111"
+      ],
+      "mean_reward": 0.475,
+      "std_reward": 0.4841,
+      "accuracy": 0.375,
+      "format_rate": 1.0,
+      "n_correct": 3,
+      "n_samples": 8,
+      "diversity": 0.52,
+      "loss": -0.0188,
+      "effective": true,
+      "tokens": 1746,
+      "peak_mem_gb": 11.72,
+      "step_s": 314.7,
+      "elapsed_s": 1153.3
+    },
+    {
+      "step": 5,
+      "prompt_ids": [
+        "p0105"
+      ],
+      "mean_reward": 0.975,
+      "std_reward": 0.3307,
+      "accuracy": 0.875,
+      "format_rate": 1.0,
+      "n_correct": 7,
+      "n_samples": 8,
+      "diversity": 0.36,
+      "loss": -0.0226,
+      "effective": true,
+      "tokens": 2072,
+      "peak_mem_gb": 11.72,
+      "step_s": 361.9,
+      "elapsed_s": 1515.2
+    },
+    {
+      "step": 6,
+      "prompt_ids": [
+        "p0095"
+      ],
+      "mean_reward": 0.6,
+      "std_reward": 0.5,
+      "accuracy": 0.5,
+      "format_rate": 1.0,
+      "n_correct": 4,
+      "n_samples": 8,
+      "diversity": 0.497,
+      "loss": 0.0041,
+      "effective": true,
+      "tokens": 1969,
+      "peak_mem_gb": 11.72,
+      "step_s": 340.9,
+      "elapsed_s": 1856.2
+    },
+    {
+      "step": 7,
+      "prompt_ids": [
+        "p0010"
+      ],
+      "mean_reward": 0.1,
+      "std_reward": 0.0,
+      "accuracy": 0.0,
+      "format_rate": 1.0,
+      "n_correct": 0,
+      "n_samples": 8,
+      "diversity": 0.554,
+      "loss": null,
+      "effective": false,
+      "tokens": 0,
+      "peak_mem_gb": 11.72,
+      "step_s": 187.2,
+      "elapsed_s": 2043.9
+    },
+    {
+      "step": 8,
+      "prompt_ids": [
+        "p0031"
+      ],
+      "mean_reward": 0.475,
+      "std_reward": 0.4841,
+      "accuracy": 0.375,
+      "format_rate": 1.0,
+      "n_correct": 3,
+      "n_samples": 8,
+      "diversity": 0.584,
+      "loss": 0.0262,
+      "effective": true,
+      "tokens": 1918,
+      "peak_mem_gb": 11.72,
+      "step_s": 377.6,
+      "elapsed_s": 2421.5
+    },
+    {
+      "step": 9,
+      "prompt_ids": [
+        "p0093"
+      ],
+      "mean_reward": 0.85,
+      "std_reward": 0.433,
+      "accuracy": 0.75,
+      "format_rate": 1.0,
+      "n_correct": 6,
+      "n_samples": 8,
+      "diversity": 0.464,
+      "loss": -0.0216,
+      "effective": true,
+      "tokens": 2031,
+      "peak_mem_gb": 11.72,
+      "step_s": 361.7,
+      "elapsed_s": 2783.2
+    },
+    {
+      "step": 10,
+      "prompt_ids": [
+        "p0122"
+      ],
+      "mean_reward": 1.1,
+      "std_reward": 0.0,
+      "accuracy": 1.0,
+      "format_rate": 1.0,
+      "n_correct": 8,
+      "n_samples": 8,
+      "diversity": 0.364,
+      "loss": null,
+      "effective": false,
+      "tokens": 0,
+      "peak_mem_gb": 11.72,
+      "step_s": 170.7,
+      "elapsed_s": 2954.5
+    },
+    {
+      "step": 11,
+      "prompt_ids": [
+        "p0100"
+      ],
+      "mean_reward": 0.975,
+      "std_reward": 0.3307,
+      "accuracy": 0.875,
+      "format_rate": 1.0,
+      "n_correct": 7,
+      "n_samples": 8,
+      "diversity": 0.387,
+      "loss": 0.0092,
+      "effective": true,
+      "tokens": 2098,
+      "peak_mem_gb": 11.72,
+      "step_s": 373.8,
+      "elapsed_s": 3328.4
+    },
+    {
+      "step": 12,
+      "prompt_ids": [
+        "p0112"
+      ],
+      "mean_reward": 0.975,
+      "std_reward": 0.3307,
+      "accuracy": 0.875,
+      "format_rate": 1.0,
+      "n_correct": 7,
+      "n_samples": 8,
+      "diversity": 0.462,
+      "loss": -0.0048,
+      "effective": true,
+      "tokens": 1949,
+      "peak_mem_gb": 11.72,
+      "step_s": 362.6,
+      "elapsed_s": 3691.0
+    },
+    {
+      "step": 13,
+      "prompt_ids": [
+        "p0094"
+      ],
+      "mean_reward": 0.975,
+      "std_reward": 0.3307,
+      "accuracy": 0.875,
+      "format_rate": 1.0,
+      "n_correct": 7,
+      "n_samples": 8,
+      "diversity": 0.437,
+      "loss": 0.0121,
+      "effective": true,
+      "tokens": 2171,
+      "peak_mem_gb": 11.72,
+      "step_s": 385.4,
+      "elapsed_s": 4077.0
+    },
+    {
+      "step": 14,
+      "prompt_ids": [
+        "p0069"
+      ],
+      "mean_reward": 0.725,
+      "std_reward": 0.4841,
+      "accuracy": 0.625,
+      "format_rate": 1.0,
+      "n_correct": 5,
+      "n_samples": 8,
+      "diversity": 0.458,
+      "loss": -0.0018,
+      "effective": true,
+      "tokens": 2199,
+      "peak_mem_gb": 11.72,
+      "step_s": 425.1,
+      "elapsed_s": 4502.0
+    },
+    {
+      "step": 15,
+      "prompt_ids": [
+        "p0105"
+      ],
+      "mean_reward": 0.6,
+      "std_reward": 0.5,
+      "accuracy": 0.5,
+      "format_rate": 1.0,
+      "n_correct": 4,
+      "n_samples": 8,
+      "diversity": 0.418,
+      "loss": 0.0092,
+      "effective": true,
+      "tokens": 2231,
+      "peak_mem_gb": 11.72,
+      "step_s": 438.2,
+      "elapsed_s": 4940.3
+    },
+    {
+      "step": 16,
+      "prompt_ids": [
+        "p0072"
+      ],
+      "mean_reward": 1.1,
+      "std_reward": 0.0,
+      "accuracy": 1.0,
+      "format_rate": 1.0,
+      "n_correct": 8,
+      "n_samples": 8,
+      "diversity": 0.364,
+      "loss": null,
+      "effective": false,
+      "tokens": 0,
+      "peak_mem_gb": 11.72,
+      "step_s": 204.4,
+      "elapsed_s": 5145.5
+    },
+    {
+      "step": 17,
+      "prompt_ids": [
+        "p0008"
+      ],
+      "mean_reward": 1.1,
+      "std_reward": 0.0,
+      "accuracy": 1.0,
+      "format_rate": 1.0,
+      "n_correct": 8,
+      "n_samples": 8,
+      "diversity": 0.322,
+      "loss": null,
+      "effective": false,
+      "tokens": 0,
+      "peak_mem_gb": 11.72,
+      "step_s": 157.2,
+      "elapsed_s": 5302.8
+    },
+    {
+      "step": 18,
+      "prompt_ids": [
+        "p0006"
+      ],
+      "mean_reward": 0.975,
+      "std_reward": 0.3307,
+      "accuracy": 0.875,
+      "format_rate": 1.0,
+      "n_correct": 7,
+      "n_samples": 8,
+      "diversity": 0.379,
+      "loss": -0.0143,
+      "effective": true,
+      "tokens": 1899,
+      "peak_mem_gb": 11.72,
+      "step_s": 343.3,
+      "elapsed_s": 5646.1
+    },
+    {
+      "step": 19,
+      "prompt_ids": [
+        "p0006"
+      ],
+      "mean_reward": 0.975,
+      "std_reward": 0.3307,
+      "accuracy": 0.875,
+      "format_rate": 1.0,
+      "n_correct": 7,
+      "n_samples": 8,
+      "diversity": 0.46,
+      "loss": 0.0089,
+      "effective": true,
+      "tokens": 1984,
+      "peak_mem_gb": 11.72,
+      "step_s": 343.2,
+      "elapsed_s": 5989.9
+    },
+    {
+      "step": 20,
+      "prompt_ids": [
+        "p0014"
+      ],
+      "mean_reward": 1.0938,
+      "std_reward": 0.0165,
+      "accuracy": 1.0,
+      "format_rate": 0.875,
+      "n_correct": 8,
+      "n_samples": 8,
+      "diversity": 0.517,
+      "loss": -0.0187,
+      "effective": true,
+      "tokens": 2490,
+      "peak_mem_gb": 11.72,
+      "step_s": 470.7,
+      "elapsed_s": 6460.6
+    },
+    {
+      "step": 21,
+      "prompt_ids": [
+        "p0005"
+      ],
+      "mean_reward": 1.1,
+      "std_reward": 0.0,
+      "accuracy": 1.0,
+      "format_rate": 1.0,
+      "n_correct": 8,
+      "n_samples": 8,
+      "diversity": 0.352,
+      "loss": null,
+      "effective": false,
+      "tokens": 0,
+      "peak_mem_gb": 11.72,
+      "step_s": 217.9,
+      "elapsed_s": 6678.5
+    },
+    {
+      "step": 22,
+      "prompt_ids": [
+        "p0077"
+      ],
+      "mean_reward": 0.8438,
+      "std_reward": 0.444,
+      "accuracy": 0.75,
+      "format_rate": 0.875,
+      "n_correct": 6,
+      "n_samples": 8,
+      "diversity": 0.343,
+      "loss": -0.0192,
+      "effective": true,
+      "tokens": 2457,
+      "peak_mem_gb": 11.72,
+      "step_s": 483.1,
+      "elapsed_s": 7162.0
+    },
+    {
+      "step": 23,
+      "prompt_ids": [
+        "p0095"
+      ],
+      "mean_reward": 0.7188,
+      "std_reward": 0.4924,
+      "accuracy": 0.625,
+      "format_rate": 0.875,
+      "n_correct": 5,
+      "n_samples": 8,
+      "diversity": 0.42,
+      "loss": -0.0466,
+      "effective": true,
+      "tokens": 2385,
+      "peak_mem_gb": 11.72,
+      "step_s": 441.5,
+      "elapsed_s": 7603.5
+    },
+    {
+      "step": 24,
+      "prompt_ids": [
+        "p0105"
+      ],
+      "mean_reward": 0.3375,
+      "std_reward": 0.4263,
+      "accuracy": 0.25,
+      "format_rate": 0.75,
+      "n_correct": 2,
+      "n_samples": 8,
+      "diversity": 0.569,
+      "loss": 0.016,
+      "effective": true,
+      "tokens": 2457,
+      "peak_mem_gb": 11.72,
+      "step_s": 477.9,
+      "elapsed_s": 8081.4
+    },
+    {
+      "step": 25,
+      "prompt_ids": [
+        "p0045"
+      ],
+      "mean_reward": 0.3438,
+      "std_reward": 0.4224,
+      "accuracy": 0.25,
+      "format_rate": 0.875,
+      "n_correct": 2,
+      "n_samples": 8,
+      "diversity": 0.63,
+      "loss": -0.0155,
+      "effective": true,
+      "tokens": 2432,
+      "peak_mem_gb": 11.72,
+      "step_s": 469.1,
+      "elapsed_s": 8551.1
+    },
+    {
+      "step": 26,
+      "prompt_ids": [
+        "p0031"
+      ],
+      "mean_reward": 0.45,
+      "std_reward": 0.5037,
+      "accuracy": 0.375,
+      "format_rate": 0.5,
+      "n_correct": 3,
+      "n_samples": 8,
+      "diversity": 0.715,
+      "loss": -0.0299,
+      "effective": true,
+      "tokens": 2559,
+      "peak_mem_gb": 11.72,
+      "step_s": 478.9,
+      "elapsed_s": 9030.0
+    },
+    {
+      "step": 27,
+      "prompt_ids": [
+        "p0069"
+      ],
+      "mean_reward": 0.7188,
+      "std_reward": 0.4924,
+      "accuracy": 0.625,
+      "format_rate": 0.875,
+      "n_correct": 5,
+      "n_samples": 8,
+      "diversity": 0.55,
+      "loss": -0.0088,
+      "effective": true,
+      "tokens": 2353,
+      "peak_mem_gb": 11.72,
+      "step_s": 424.0,
+      "elapsed_s": 9454.0
+    },
+    {
+      "step": 28,
+      "prompt_ids": [
+        "p0043"
+      ],
+      "mean_reward": 0.4625,
+      "std_reward": 0.4814,
+      "accuracy": 0.375,
+      "format_rate": 0.75,
+      "n_correct": 3,
+      "n_samples": 8,
+      "diversity": 0.599,
+      "loss": -0.0168,
+      "effective": true,
+      "tokens": 2472,
+      "peak_mem_gb": 11.72,
+      "step_s": 472.2,
+      "elapsed_s": 9926.8
+    },
+    {
+      "step": 29,
+      "prompt_ids": [
+        "p0005"
+      ],
+      "mean_reward": 1.1,
+      "std_reward": 0.0,
+      "accuracy": 1.0,
+      "format_rate": 1.0,
+      "n_correct": 8,
+      "n_samples": 8,
+      "diversity": 0.263,
+      "loss": null,
+      "effective": false,
+      "tokens": 0,
+      "peak_mem_gb": 11.72,
+      "step_s": 181.4,
+      "elapsed_s": 10108.1
+    },
+    {
+      "step": 30,
+      "prompt_ids": [
+        "p0007"
+      ],
+      "mean_reward": 1.1,
+      "std_reward": 0.0,
+      "accuracy": 1.0,
+      "format_rate": 1.0,
+      "n_correct": 8,
+      "n_samples": 8,
+      "diversity": 0.345,
+      "loss": null,
+      "effective": false,
+      "tokens": 0,
+      "peak_mem_gb": 11.72,
+      "step_s": 211.3,
+      "elapsed_s": 10319.5
+    },
+    {
+      "step": 31,
+      "prompt_ids": [
+        "p0069"
+      ],
+      "mean_reward": 0.8375,
+      "std_reward": 0.4547,
+      "accuracy": 0.75,
+      "format_rate": 0.75,
+      "n_correct": 6,
+      "n_samples": 8,
+      "diversity": 0.481,
+      "loss": -0.0204,
+      "effective": true,
+      "tokens": 2350,
+      "peak_mem_gb": 11.72,
+      "step_s": 454.1,
+      "elapsed_s": 10774.0
+    },
+    {
+      "step": 32,
+      "prompt_ids": [
+        "p0039"
+      ],
+      "mean_reward": 0.975,
+      "std_reward": 0.3307,
+      "accuracy": 0.875,
+      "format_rate": 1.0,
+      "n_correct": 7,
+      "n_samples": 8,
+      "diversity": 0.62,
+      "loss": 0.0087,
+      "effective": true,
+      "tokens": 1933,
+      "peak_mem_gb": 11.72,
+      "step_s": 362.2,
+      "elapsed_s": 11136.2
+    },
+    {
+      "step": 33,
+      "prompt_ids": [
+        "p0083"
+      ],
+      "mean_reward": 1.1,
+      "std_reward": 0.0,
+      "accuracy": 1.0,
+      "format_rate": 1.0,
+      "n_correct": 8,
+      "n_samples": 8,
+      "diversity": 0.432,
+      "loss": null,
+      "effective": false,
+      "tokens": 0,
+      "peak_mem_gb": 11.72,
+      "step_s": 182.8,
+      "elapsed_s": 11319.0
+    },
+    {
+      "step": 34,
+      "prompt_ids": [
+        "p0015"
+      ],
+      "mean_reward": 0.6,
+      "std_reward": 0.5,
+      "accuracy": 0.5,
+      "format_rate": 1.0,
+      "n_correct": 4,
+      "n_samples": 8,
+      "diversity": 0.412,
+      "loss": 0.0098,
+      "effective": true,
+      "tokens": 2243,
+      "peak_mem_gb": 11.72,
+      "step_s": 415.0,
+      "elapsed_s": 11734.5
+    },
+    {
+      "step": 35,
+      "prompt_ids": [
+        "p0008"
+      ],
+      "mean_reward": 0.725,
+      "std_reward": 0.4841,
+      "accuracy": 0.625,
+      "format_rate": 1.0,
+      "n_correct": 5,
+      "n_samples": 8,
+      "diversity": 0.348,
+      "loss": -0.0187,
+      "effective": true,
+      "tokens": 1966,
+      "peak_mem_gb": 11.72,
+      "step_s": 331.6,
+      "elapsed_s": 12066.1
+    },
+    {
+      "step": 36,
+      "prompt_ids": [
+        "p0009"
+      ],
+      "mean_reward": 0.975,
+      "std_reward": 0.3307,
+      "accuracy": 0.875,
+      "format_rate": 1.0,
+      "n_correct": 7,
+      "n_samples": 8,
+      "diversity": 0.433,
+      "loss": 0.0015,
+      "effective": true,
+      "tokens": 1761,
+      "peak_mem_gb": 11.72,
+      "step_s": 293.8,
+      "elapsed_s": 12359.8
+    },
+    {
+      "step": 37,
+      "prompt_ids": [
+        "p0015"
+      ],
+      "mean_reward": 0.35,
+      "std_reward": 0.433,
+      "accuracy": 0.25,
+      "format_rate": 1.0,
+      "n_correct": 2,
+      "n_samples": 8,
+      "diversity": 0.426,
+      "loss": -0.0101,
+      "effective": true,
+      "tokens": 2205,
+      "peak_mem_gb": 11.72,
+      "step_s": 405.2,
+      "elapsed_s": 12765.6
+    },
+    {
+      "step": 38,
+      "prompt_ids": [
+        "p0095"
+      ],
+      "mean_reward": 1.1,
+      "std_reward": 0.0,
+      "accuracy": 1.0,
+      "format_rate": 1.0,
+      "n_correct": 8,
+      "n_samples": 8,
+      "diversity": 0.207,
+      "loss": null,
+      "effective": false,
+      "tokens": 0,
+      "peak_mem_gb": 11.72,
+      "step_s": 162.7,
+      "elapsed_s": 12928.4
+    },
+    {
+      "step": 39,
+      "prompt_ids": [
+        "p0066"
+      ],
+      "mean_reward": 0.5938,
+      "std_reward": 0.5065,
+      "accuracy": 0.5,
+      "format_rate": 0.875,
+      "n_correct": 4,
+      "n_samples": 8,
+      "diversity": 0.526,
+      "loss": -0.0565,
+      "effective": true,
+      "tokens": 2163,
+      "peak_mem_gb": 11.72,
+      "step_s": 422.4,
+      "elapsed_s": 13350.8
+    },
+    {
+      "step": 40,
+      "prompt_ids": [
+        "p0051"
+      ],
+      "mean_reward": 0.3438,
+      "std_reward": 0.4369,
+      "accuracy": 0.25,
+      "format_rate": 0.875,
+      "n_correct": 2,
+      "n_samples": 8,
+      "diversity": 0.557,
+      "loss": 0.0169,
+      "effective": true,
+      "tokens": 2255,
+      "peak_mem_gb": 11.72,
+      "step_s": 421.7,
+      "elapsed_s": 13773.1
+    }
+  ],
+  "weights": {
+    "correct": 1.0,
+    "format": 0.05,
+    "steps": 0.05,
+    "overlong_penalty": -0.1
+  },
+  "kl_coef": 0.02
+}
