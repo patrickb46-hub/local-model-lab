@@ -17,6 +17,11 @@ demo_board.py —— 三栏实时看板 + 演示训练编排（单进程）
   会让看板一开场就是满格 —— 整段视频都在说谎。所以启动前必须轮转旧 jsonl，
   且演示产物永远落在 adapter-DEMO-*/，绝不碰 adapter-A1/B/C。
 
+答案流（RL 实时判定）：
+  20_train_rl.py 会把每条采样（题目 + 解答文本 + 对错）写到 *.samples.jsonl。
+  跑 B / C 时，看板在底部把它渲染成「答案流」：题目、标准答案、8 条采样的
+  解答与 ✓/✗，加上累计正确率和迷你趋势图 —— 让「RL 进步过程」在终端连续可见。
+
 用法：
   bash scripts/demo_run.sh A            # 演示：真跑支线 A（推荐入口）
   python3 scripts/demo_board.py --run A
@@ -53,6 +58,9 @@ if not os.path.exists(PY):
 RULE = "─"
 ESC = "\033["
 
+# tqdm / 进度条行（权重加载时用 \r 覆盖，落到文件里是垃圾行）：读日志尾部时过滤掉
+_TQDM = re.compile(r"\d+%\|[^|]*\||\|\s*\d+/\d+\s*\[|\d+\.\d+\s*(?:it|s)/s")
+
 # 整行着色：先拼好纯文本再包色，所以不影响宽度计算
 C_DONE, C_RUN, C_PEND, C_FAIL, C_DIM, C_HDR, C_RST = (
     "\033[32m", "\033[36m", "\033[90m", "\033[31m", "\033[2m", "\033[1m", "\033[0m")
@@ -64,6 +72,7 @@ LEGS = [
         "est": 130.0, "load": 110.0,
         "jsonl": "branch-A-distill/logs/train_distill-DEMO-A.jsonl",
         "sumjson": "branch-A-distill/logs/train_distill_summary-DEMO-A.json",
+        "samples": None,
         "adapter": "branch-A-distill/adapter-DEMO-A",
         "anchor": "branch-A-distill/adapter-A1",   # 诚实性锚点：真实产物
         "script": "scripts/11_train_distill.py",
@@ -76,6 +85,7 @@ LEGS = [
         "est": 344.0, "load": 110.0,
         "jsonl": "branch-B-rl/logs/rl_train-DEMO-B.jsonl",
         "sumjson": "branch-B-rl/logs/rl_train_summary-DEMO-B.json",
+        "samples": "branch-B-rl/logs/rl_train-DEMO-B.samples.jsonl",
         "adapter": "branch-B-rl/adapter-DEMO-B",
         "anchor": "branch-B-rl/adapter-B",
         "script": "scripts/20_train_rl.py",
@@ -88,6 +98,7 @@ LEGS = [
         "est": 224.0, "load": 110.0,
         "jsonl": "branch-B-rl/logs/rl_train-DEMO-C.jsonl",
         "sumjson": "branch-B-rl/logs/rl_train_summary-DEMO-C.json",
+        "samples": "branch-B-rl/logs/rl_train-DEMO-C.samples.jsonl",
         "adapter": "branch-B-rl/adapter-DEMO-C",
         "anchor": "branch-B-rl/adapter-C",
         "script": "scripts/20_train_rl.py",
@@ -261,7 +272,31 @@ def read_records(path, cap=262144):
     return out
 
 
-_TQDM = re.compile(r"\d+\s*it/s\]|Loading weights|\bit/s\b")
+def read_samples(path, cap=131072):
+    """读答案流 sidecar 的末尾若干行（每行含完整解答文本，可能较长）。"""
+    if not path or not os.path.exists(path):
+        return []
+    try:
+        with open(path, "rb") as f:
+            f.seek(0, os.SEEK_END)
+            size = f.tell()
+            f.seek(max(0, size - cap))
+            blob = f.read()
+    except OSError:
+        return []
+    text = blob.decode("utf-8", "replace")
+    if size > cap and "\n" in text:
+        text = text.split("\n", 1)[1]      # 丢掉被截断的首行
+    out = []
+    for line in text.splitlines():
+        line = line.strip()
+        if not line:
+            continue
+        try:
+            out.append(json.loads(line))
+        except ValueError:
+            continue
+    return out
 
 
 def read_tail(path, n=5, maxcol=110):
@@ -334,6 +369,7 @@ def new_plan(lang, refresh, intro, steps_map):
             "load_s": leg["load"],
             "cmd": build_cmd(leg, steps),
             "jsonl": leg["jsonl"],
+            "samples": leg.get("samples"),
             "raw_log": os.path.join("logs", "demo", leg["id"] + ".log"),
             "exit_file": os.path.join("logs", "demo", leg["id"] + ".exit"),
             "adapter": leg["adapter"],
@@ -437,6 +473,7 @@ def leg_view(leg, pleg, running_id):
         "log_path": log_path, "log_age": log_age,
         "log_bytes": file_size(log_path),
         "jsonl_path": jsonl_path,
+        "samples": read_samples(abspath(leg.get("samples") or "")),
     }
 
 
@@ -593,6 +630,99 @@ def render_leg(leg, v, W, lang, beat, compact=False):
     return lines
 
 
+# ─────────────────────────── 答案流（RL 实时判定） ───────────────────────────
+_ANS_RE = re.compile(r"【答案】\s*([^\n]*)")
+
+
+def _collapse(s):
+    return re.sub(r"\s+", " ", (s or "").strip())
+
+
+def _answer_tail(text):
+    m = _ANS_RE.search(text or "")
+    return m.group(1).strip() if m else None
+
+
+def spark(accs, w=24):
+    """准确率序列 → 迷你趋势图（▁▂▃▄▅▆▇█，按绝对值 0..1 映射）。"""
+    accs = list(accs)[-w:]
+    if not accs:
+        return "—"
+    bars = "▁▂▃▄▅▆▇█"
+    return "".join(bars[max(0, min(7, int(round(a * 7))))] for a in accs)
+
+
+def answer_stream(v, W, lang, beat):
+    """RL 专用：把「本步采样 + 判定」画成实时答案流。"""
+    zh = (lang != "en")
+    samples = v.get("samples") or []
+    by_step, latest = {}, None
+    for s in samples:
+        st = s.get("step")
+        by_step.setdefault(st, []).append(s)
+        if latest is None or st > latest:
+            latest = st
+    cur = by_step.get(latest, []) if latest is not None else []
+    accs = [float(r.get("accuracy") or 0) for r in v.get("recs", [])]
+    total_ok = sum(1 for x in samples if x.get("correct"))
+    total_n = len(samples)
+
+    if zh:
+        head = " 答案流 · 实时判定   step %s · 组内 %d 条采样" % (
+            latest if latest is not None else "-", len(cur))
+    else:
+        head = " answer stream · live verifier   step %s · %d rollouts" % (
+            latest if latest is not None else "-", len(cur))
+    lines = [C_HDR + pad(head, W) + C_RST]
+
+    first = cur[0] if cur else (samples[-1] if samples else None)
+    if first:
+        q = _collapse(first.get("prompt", ""))
+        g = _collapse(first.get("gold", ""))
+        if zh:
+            lines.append(pad("   题目  " + cut(q, W - 12), W))
+            lines.append(pad("   标准答案  " + cut(g, W - 14), W))
+        else:
+            lines.append(pad("   Q    " + cut(q, W - 10), W))
+            lines.append(pad("   gold " + cut(g, W - 10), W))
+
+    if not samples:
+        note = ("   正在采样第一组答案… %s" % beat) if zh else (
+            "   sampling first batch... %s" % beat)
+        lines.append(C_DIM + pad(note, W) + C_RST)
+    else:
+        for i, s in enumerate(cur):
+            ok = bool(s.get("correct"))
+            mark = "✓" if ok else "✗"
+            color = C_DONE if ok else C_FAIL
+            ans = _answer_tail(s.get("text", ""))
+            body = _collapse(s.get("text", ""))
+            if ans:
+                idx = body.find("【答案】")
+                head = (body[:idx].strip() if idx >= 0 else body) or body
+                disp = cut(head, max(8, W - 36)) + "  【答案】" + cut(ans, 18)
+            else:
+                disp = cut(body, max(12, W - 12))
+            disp = cut(disp, max(20, W - 12))
+            lines.append("   #%d %s%s%s  %s" % (i + 1, color, mark, C_RST, disp))
+
+    if cur and len(cur) < 8 and v["state"] in ("running", "loading", "stale"):
+        note = ("   已到 %d 条，仍在采样… %s" % (len(cur), beat)) if zh else (
+            "   %d so far, sampling... %s" % (len(cur), beat))
+        lines.append(C_DIM + pad(note, W) + C_RST)
+
+    if total_n:
+        cur_ok = sum(1 for x in cur if x.get("correct"))
+        rate = total_ok / total_n
+        foot = " 本步 ✓ %d/%d · 累计正确率 %d%%（%d/%d）· 趋势 %s" % (
+            cur_ok, len(cur), int(100 * rate + 0.5), total_ok, total_n, spark(accs))
+        if not zh:
+            foot = " step ✓ %d/%d · acc %d%% (%d/%d) · trend %s" % (
+                cur_ok, len(cur), int(100 * rate + 0.5), total_ok, total_n, spark(accs))
+        lines.append(pad(cut(foot, W - 2), W))
+    return lines
+
+
 def render(views, plan, W, H, lang, tick, running_id, mode=None):
     beat = "|/-\\"[tick % 4]
     compact = (mode == "compact" if mode else H < 23)
@@ -637,28 +767,34 @@ def render(views, plan, W, H, lang, tick, running_id, mode=None):
                 out.append(pad(RULE * W, W))
             out.extend(render_leg(v["leg"], v, W, lang, beat, compact))
 
-    # 原始日志尾部：证明这是真进程，不是画出来的图
+    # 原始日志尾部 / RL 答案流：证明这是真进程，不是画出来的图
     if not minimal:
         cur = next((v for v in views if v["leg"]["id"] == running_id), None)
         if cur:
-            ag = cur["log_age"]
-            rel = "%s" % (hms(ag) + " 前" if ag is not None else "未创建")
-            if lang == "en":
-                rel = "%s ago" % hms(ag) if ag is not None else "not created"
-            head = (" 原始输出 · %s · 更新 %s" % (
-                os.path.basename(cur["log_path"]), rel)) if lang != "en" else (
-                " raw output · %s · updated %s" % (
-                    os.path.basename(cur["log_path"]), rel))
             room = H - len(out) - 2
-            n = 3 if compact else 5
-            n = max(0, min(n, room))
-            if n > 0:
-                out.append(C_DIM + pad(head, W) + C_RST)
-                tail = read_tail(cur["log_path"], n)
-                if not tail:
-                    tail = ["  (等待首批输出…)" if lang != "en" else "  (waiting for first output...)"]
-                for t in tail[-n:]:
-                    out.append(C_DIM + pad("   │ " + t, W) + C_RST)
+            if cur["leg"]["kind"] == "rl":
+                # RL：答案流面板（题目 + 解答 + 对错 + 趋势），比原始日志更直观
+                stream = answer_stream(cur, W, lang, beat)
+                n = max(0, min(len(stream), room))
+                out.extend(stream[:n])
+            else:
+                ag = cur["log_age"]
+                rel = "%s" % (hms(ag) + " 前" if ag is not None else "未创建")
+                if lang == "en":
+                    rel = "%s ago" % hms(ag) if ag is not None else "not created"
+                head = (" 原始输出 · %s · 更新 %s" % (
+                    os.path.basename(cur["log_path"]), rel)) if lang != "en" else (
+                    " raw output · %s · updated %s" % (
+                        os.path.basename(cur["log_path"]), rel))
+                n = 3 if compact else 5
+                n = max(0, min(n, room))
+                if n > 0:
+                    out.append(C_DIM + pad(head, W) + C_RST)
+                    tail = read_tail(cur["log_path"], n)
+                    if not tail:
+                        tail = ["  (等待首批输出…)" if lang != "en" else "  (waiting for first output...)"]
+                    for t in tail[-n:]:
+                        out.append(C_DIM + pad("   │ " + t, W) + C_RST)
 
     if not minimal:
         foot = " 16GB 内存只能串行：同一时刻仅一栏在动"
@@ -736,20 +872,18 @@ def disclaimer(steps_map, lang):
     ]
     full = {"A": 40, "B": 40, "C": 40}
     wall = {"A": "87 min", "B": "3.8 h", "C": "2.5 h"}
+    def_steps = {"A": 4, "B": 2, "C": 2}
+    tags = ("A", "B", "C")
     rows = []
+    ti = 0                      # 三行含 %d 的声明依次对应 A / B / C
     for i in range(len(zh)):
-        if lang == "en":
-            rows.append(en[i] % (
-                steps_map.get("A", 4), full["A"], wall["A"],
-                steps_map.get("B", 2), full["B"], wall["B"],
-                steps_map.get("C", 2), full["C"], wall["C"],
-            ) if "%d" in en[i] else en[i])
-        else:
-            rows.append(zh[i] % (
-                steps_map.get("A", 4), full["A"], wall["A"],
-                steps_map.get("B", 2), full["B"], wall["B"],
-                steps_map.get("C", 2), full["C"], wall["C"],
-            ) if "%d" in zh[i] else zh[i])
+        line = en[i] if lang == "en" else zh[i]
+        if "%d" in line:
+            tag = tags[ti]
+            line = line % (steps_map.get(tag, def_steps[tag]),
+                           full[tag], wall[tag])
+            ti += 1
+        rows.append(line)
     return rows
 
 
@@ -785,7 +919,10 @@ def rotate_leg(leg, run_id):
     """
     bucket = os.path.join(DEMO_DIR, "history", run_id)
     os.makedirs(bucket, exist_ok=True)
-    for rel in (leg["jsonl"], leg["sumjson"]):
+    rels = [leg["jsonl"], leg["sumjson"]]
+    if leg.get("samples"):
+        rels.append(leg["samples"])
+    for rel in rels:
         src = abspath(rel)
         if os.path.exists(src):
             try:

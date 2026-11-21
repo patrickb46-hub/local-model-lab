@@ -1,0 +1,1 @@
+{"step": 1, "prompt_ids": ["p0077"], "mean_reward": 0.475, "std_reward": 0.4841, "accuracy": 0.375, "format_rate": 1.0, "n_correct": 3, "n_samples": 8, "diversity": 0.312, "loss": -0.0194, "effective": true, "tokens": 2278, "peak_mem_gb": 10.54, "step_s": 755.4, "elapsed_s": 755.5}

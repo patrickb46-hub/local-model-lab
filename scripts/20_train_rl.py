@@ -121,6 +121,9 @@ def main() -> int:
     adapter_dir = b_dir / f"adapter{suffix}"
     log_path = b_dir / "logs" / f"rl_train{suffix}.jsonl"
     sum_path = b_dir / "logs" / f"rl_train_summary{suffix}.json"
+    # 答案流 sidecar：把每条采样（解答文本 + 对错）实时落盘，供 demo 看板连续展示。
+    # 与 log_path 同族、同 tag 隔离；仅追加，不影响任何训练逻辑。
+    samples_path = b_dir / "logs" / f"rl_train{suffix}.samples.jsonl"
     dtype = args.dtype or cfg["base_model"].get("dtype", "float32")
     steps = args.steps if args.steps is not None else g["max_steps"]
     pps = args.prompts_per_step if args.prompts_per_step is not None else g["prompts_per_step"]
@@ -217,6 +220,7 @@ def main() -> int:
 
     ensure_dir(log_path.parent)
     logf = open(log_path, "a", encoding="utf-8")
+    sf = open(samples_path, "a", encoding="utf-8")
 
     rnd = __import__("random").Random(g["seed"])
     t_start = time.time()
@@ -269,6 +273,15 @@ def main() -> int:
                 sample_rewards.append({"id": item["id"], "reward": rew,
                                        "correct": parts["correct"] > 0,
                                        "format": parts["format"] > 0, "text": t_})
+                # 答案流：每条采样即写即刷，看板可边采样边显示
+                sf.write(json.dumps({
+                    "step": step, "id": item["id"],
+                    "prompt": item["prompt"], "gold": item["answer"],
+                    "text": t_, "reward": round(rew, 4),
+                    "correct": bool(parts["correct"] > 0),
+                    "format": bool(parts["format"] > 0),
+                }, ensure_ascii=False) + "\n")
+                sf.flush()
 
             # ---- 组内归一化算优势（C4：无偏 std）----
             rs = torch.tensor([c["reward"] for c in comps], dtype=torch.float32)
@@ -377,6 +390,7 @@ def main() -> int:
             _save(model, tok, adapter_dir)
 
     logf.close()
+    sf.close()
     _save(model, tok, adapter_dir)
 
     banner("RL 训练结束")
